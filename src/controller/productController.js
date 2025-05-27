@@ -311,69 +311,6 @@ export const searchProduct = async (req, res) => {
   }
 };
 
-export const getPopularProducts = async (req, res) => {
-  try {
-    const orders = await Order.find({}, "items.productId");
-
-    if (!orders || orders.length === 0) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.NOT_FOUND,
-        "No orders found"
-      );
-    }
-
-    const productIds = [
-      ...new Set(
-        orders
-          .flatMap((order) =>
-            order.items.map((item) => item.productId?.toString())
-          )
-          .filter((id) => id)
-      ),
-    ];
-
-    if (productIds.length === 0) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.NOT_FOUND,
-        "No product IDs found in orders"
-      );
-    }
-
-    const objectIds = productIds.map((id) => new mongoose.Types.ObjectId(id));
-
-    const products = await Product.find({ _id: { $in: objectIds } });
-
-    if (!products || products.length === 0) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.NOT_FOUND,
-        "No matching products found"
-      );
-    }
-
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      "Popular products fetched successfully",
-      products
-    );
-  } catch (error) {
-    console.error("Error fetching popular products:", error.message);
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR
-    );
-  }
-};
-
 // import {
 //   subcategoryModel,
 //   subcategoryValidation,
