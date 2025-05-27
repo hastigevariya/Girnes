@@ -21,7 +21,7 @@ export async function addBanner(req, res) {
 
   try {
     const newBanner = await bannerModel.create({
-      image: req?.file?.filename,
+      image: req?.file?.filename, // file add
     });
 
     return response.success(
