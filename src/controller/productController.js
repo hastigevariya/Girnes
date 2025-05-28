@@ -151,8 +151,29 @@ export const getAllProducts = async (req, res) => {
     const startIndex = (pageNum - 1) * limitNum;
     const endIndex = startIndex + limitNum;
 
+
     // Paginate products
-    const paginatedProducts = products.slice(startIndex, endIndex);
+    //const {paginatedProducts = products.slice(startIndex, endIndex);
+
+    const updatedProducts = await Promise.all(
+      products.map(async (product) => {
+        const dailyDeal = await dailydealModel.findOne({
+          productId: product._id.toString(),
+          isActive: true,
+        });
+
+        const salePrice = dailyDeal?.salePrice ?? null;
+        const price = salePrice ?? product?.price;
+
+        return {
+          ...product,
+          price
+        };
+      })
+    );
+
+    const paginatedProducts = updatedProducts.slice(startIndex, endIndex);
+
 
     return response.success(
       res,
@@ -190,13 +211,22 @@ export const getProductById = async (req, res) => {
         resMessage.NOT_FOUND
       );
     }
+    const dailyData = await dailydealModel.findOne({
+      productId: req.params.id,
+      isActive: true,
+    });
+
+    const finalProduct = {
+      ...product._doc,
+      price: dailyData ? dailyData.salePrice : product.price,
+    };
 
     return response.success(
       res,
       req.languageCode,
       resStatusCode.ACTION_COMPLETE,
       resMessage.PRODUCT_FETCHED,
-      product
+      finalProduct
     );
   } catch (err) {
     console.error(err);
