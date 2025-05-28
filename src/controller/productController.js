@@ -24,6 +24,8 @@ export const createProduct = async (req, res) => {
       dailySalePrice,
       isSale,
       isActive,
+      startSale,
+      endSale
     } = req.body;
 
     if (typeof bulletPoint === "string") {
@@ -43,7 +45,10 @@ export const createProduct = async (req, res) => {
       description,
       sku,
       isActive,
+      startSale,
+      endSale
     };
+
     const { error } = productValidation.validate(formattedBody);
     if (error) {
       return response.error(
@@ -66,12 +71,39 @@ export const createProduct = async (req, res) => {
     const isSaleBool = isSale === "true" ? true : false;
     const newProduct = await productModel.create(formattedBody);
     console.log('isSale', typeof (isSale));
-    if (isSale === true || isSale === 'true') {
-      await dailydealModel.create({
-        productId: newProduct?._id,
-        salePrice: dailySalePrice,
-        isActive: isSaleBool
-      });
+    // if (isSale === true || isSale === 'true') {
+    // if(startDate == endDate) {
+
+    if (isSaleBool) {
+
+      const start = new Date(startSale);
+      const end = new Date(endSale);
+
+      const diffMs = end - start;
+
+      const is24Hours = diffMs === 24 * 60 * 60 * 1000;
+
+      if (is24Hours) {
+        await dailydealModel.create({
+          productId: newProduct?._id,
+          salePrice: dailySalePrice,
+          isDailySale: 1,
+          isActive: isSaleBool,
+          isActive: true,
+          startSale: start,
+          endSale: end,
+
+        });
+      } else {
+        await dailydealModel.create({
+          productId: newProduct?._id,
+          salePrice: dailySalePrice,
+          isDailySale: 2, // Hot deal
+          isActive: isSaleBool,
+          startSale: start,
+          endSale: end,
+        });
+      }
     }
     return response.success(
       res,
