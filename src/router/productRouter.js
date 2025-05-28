@@ -20,7 +20,7 @@ router.post(
 router.get("/getAllProduct", getAllProducts);
 router.get("/getProductById/:id", getProductById);
 //router.put("/update/:id", updateProduct);
-router.put("/updateProduct/:id", productImage.single("image"), updateProduct);
+router.put("/updateProduct/:id", productImage.fields([{ name: 'image' }]), updateProduct);
 //router.put('/admin/updateProduct/:id', productImage.fields([{ name: 'image' }]), validateAccessToken, authorizeRoles("admin"), productController.updateSingleProduct);
 router.delete("/delete/:id", deleteProduct);
 router.get("/searchProduct/:searchProduct", searchProduct);

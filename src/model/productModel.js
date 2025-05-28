@@ -16,7 +16,7 @@ const productSchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
-    image: { type: String, required: false },
+    image: { type: [String], required: false },
     sku: { type: String, required: false },
     isActive: { type: Boolean, default: true },
     isDelete: { type: Boolean, default: false },
@@ -201,6 +201,9 @@ export const updateProductValidation = Joi.object({
   isDelete: Joi.boolean().optional(),
   isSale: Joi.boolean().optional(),
   dailySalePrice: Joi.number().optional(),
+  startSale: Joi.date().optional(),
+  endSale: Joi.date().optional(),
+
 });
 
 // export const hotDealValidation = Joi.object({
