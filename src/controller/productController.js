@@ -1,4 +1,5 @@
-import { productModel, productValidation } from "../model/productModel.js";
+import { productModel, productValidation, dailydealModel } from "../model/productModel.js";
+
 import response from "../utils/response.js";
 import { orderModel } from "../model/orderModel.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
@@ -66,7 +67,7 @@ export const createProduct = async (req, res) => {
     const newProduct = await productModel.create(formattedBody);
     console.log('isSale', typeof (isSale));
     if (isSale === true || isSale === 'true') {
-      await dailydealModels.create({
+      await dailydealModel.create({
         productId: newProduct?._id,
         salePrice: dailySalePrice,
         isActive: isSaleBool
@@ -260,6 +261,15 @@ export const updateProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return response.error(
+        res,
+        req.languageCode,
+        resStatusCode.BAD_REQUEST,
+        "Invalid product id"
+      );
+    }
+
     let isFeaturedConvertArry = [];
     if (req.body.isFeatured && typeof req.body.isFeatured === "string") {
       isFeaturedConvertArry = req.body.isFeatured
@@ -269,6 +279,16 @@ export const updateProduct = async (req, res) => {
       req.body.isFeatured = isFeaturedConvertArry;
     }
 
+    if (typeof req.body.bulletPoint === "string") {
+      try {
+        req.body.bulletPoint = JSON.parse(req.body.bulletPoint);
+      } catch (e) {
+        req.body.bulletPoint = req.body.bulletPoint
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+    }
     req.body.isActive = req.body.isActive === "true" || req.body.isActive === true;
     const isSale = req.body.isSale === "true" || req.body.isSale === true;
     const dailySalePrice = req.body.dailySalePrice;
@@ -308,17 +328,17 @@ export const updateProduct = async (req, res) => {
     };
 
     const updatedProduct = await productModel.findByIdAndUpdate(id, updatedData, { new: true });
-
     // Handle daily deal update
-    if (isSale && dailySalePrice) {
-      await dailydealModels.findOneAndUpdate(
+    if (isSale || dailySalePrice) {
+      await dailydealModel.findOneAndUpdate(
         { productId: id },
-        { salePrice: dailySalePrice, isActive: true },
+        { salePrice: dailySalePrice, isActive: isSale },
         { upsert: true, new: true }
       );
-    } else {
-      await dailydealModels.deleteOne({ productId: id });
     }
+    // else {
+    //   await dailydealModel.deleteOne({ productId: id });
+    // }
 
     return response.success(
       res,

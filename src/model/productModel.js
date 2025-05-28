@@ -20,6 +20,7 @@ const productSchema = new mongoose.Schema(
     sku: { type: String, required: false },
     isActive: { type: Boolean, default: true },
     isDelete: { type: Boolean, default: false },
+
   },
   { timestamps: true }
 );
@@ -34,7 +35,7 @@ const dailydealSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-export const dailydealModels = mongoose.model("dailydeals", dailydealSchema);
+export const dailydealModel = mongoose.model("dailydeals", dailydealSchema);
 
 import Joi from "joi";
 
@@ -142,6 +143,7 @@ export const updateProductValidation = Joi.object({
   quantity: Joi.number().integer().min(0).optional(),
   stock: Joi.number().integer().min(0).optional(),
   subcategoryId: Joi.string().length(24).hex().optional(),
+  categoryId: Joi.string().length(24).hex().optional(),
   tag: Joi.string().optional(),
   description: Joi.string().optional(),
   image: Joi.string().pattern(/\.(jpg|jpeg|png|gif|webp)$/i).optional(),
