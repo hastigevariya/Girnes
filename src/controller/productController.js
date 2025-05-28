@@ -1,6 +1,10 @@
 import { productModel, productValidation } from "../model/productModel.js";
 import response from "../utils/response.js";
+import { orderModel } from "../model/orderModel.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
+import mongoose from "mongoose";
+import { updateProductValidation } from "../model/productModel.js";
+
 
 // Create Product
 export const createProduct = async (req, res) => {
@@ -16,6 +20,8 @@ export const createProduct = async (req, res) => {
       tag,
       description,
       sku,
+      dailySalePrice,
+      isSale,
       isActive,
     } = req.body;
 
@@ -56,9 +62,16 @@ export const createProduct = async (req, res) => {
         "SKU already exists. Please use a unique SKU."
       );
     }
-
+    const isSaleBool = isSale === "true" ? true : false;
     const newProduct = await productModel.create(formattedBody);
-
+    console.log('isSale', typeof (isSale));
+    if (isSale === true || isSale === 'true') {
+      await dailydealModels.create({
+        productId: newProduct?._id,
+        salePrice: dailySalePrice,
+        isActive: isSaleBool
+      });
+    }
     return response.success(
       res,
       req.languageCode,
@@ -196,33 +209,115 @@ export const getProductById = async (req, res) => {
 };
 
 // Update
+// export const updateProduct = async (req, res) => {
+//   const { error } = productValidation.validate(req.body);
+//   if (error) {
+//     return response.error(
+//       res,
+//       req.languageCode,
+//       resStatusCode.CLIENT_ERROR,
+//       error.details[0].message
+//     );
+//   }
+
+//   try {
+//     const updatedProduct = await productModel.findByIdAndUpdate(
+//       req.params.id,
+//       req.body,
+//       {
+//         new: true,
+//       }
+//     );
+
+//     if (!updatedProduct) {
+//       return response.error(
+//         res,
+//         req.languageCode,
+//         resStatusCode.NOT_FOUND,
+//         resMessage.NOT_FOUND
+//       );
+//     }
+
+//     return response.success(
+//       res,
+//       req.languageCode,
+//       resStatusCode.ACTION_COMPLETE,
+//       resMessage.PRODUCT_UPDATED,
+//       updatedProduct
+//     );
+//   } catch (err) {
+//     console.error(err);
+//     return response.error(
+//       res,
+//       req.languageCode,
+//       resStatusCode.INTERNAL_SERVER_ERROR,
+//       resMessage.INTERNAL_SERVER_ERROR
+//     );
+//   }
+// };
+
 export const updateProduct = async (req, res) => {
-  const { error } = productValidation.validate(req.body);
-  if (error) {
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.CLIENT_ERROR,
-      error.details[0].message
-    );
-  }
+  const { id } = req.params;
 
   try {
-    const updatedProduct = await productModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-      }
-    );
+    let isFeaturedConvertArry = [];
+    if (req.body.isFeatured && typeof req.body.isFeatured === "string") {
+      isFeaturedConvertArry = req.body.isFeatured
+        .replace(/[\[\]\s]+/g, "")
+        .split(",")
+        .map((item) => item.trim());
+      req.body.isFeatured = isFeaturedConvertArry;
+    }
 
-    if (!updatedProduct) {
+    req.body.isActive = req.body.isActive === "true" || req.body.isActive === true;
+    const isSale = req.body.isSale === "true" || req.body.isSale === true;
+    const dailySalePrice = req.body.dailySalePrice;
+
+    const { error } = updateProductValidation.validate(req.body);
+    if (error) {
+      return response.error(
+        res,
+        req.languageCode,
+        resStatusCode.BAD_REQUEST,
+        error.details[0].message
+      );
+    }
+
+    const existingProduct = await productModel.findById(id);
+    if (!existingProduct) {
       return response.error(
         res,
         req.languageCode,
         resStatusCode.NOT_FOUND,
         resMessage.NOT_FOUND
       );
+    }
+
+    const uploadedFiles = req?.files?.image?.map((file) => file.filename) || [];
+    let updatedImages = existingProduct.image;
+
+    if (uploadedFiles.length > 0) {
+      updatedImages = uploadedFiles;
+    }
+
+    delete req.body.sku;
+
+    const updatedData = {
+      ...req.body,
+      image: updatedImages,
+    };
+
+    const updatedProduct = await productModel.findByIdAndUpdate(id, updatedData, { new: true });
+
+    // Handle daily deal update
+    if (isSale && dailySalePrice) {
+      await dailydealModels.findOneAndUpdate(
+        { productId: id },
+        { salePrice: dailySalePrice, isActive: true },
+        { upsert: true, new: true }
+      );
+    } else {
+      await dailydealModels.deleteOne({ productId: id });
     }
 
     return response.success(
@@ -232,8 +327,8 @@ export const updateProduct = async (req, res) => {
       resMessage.PRODUCT_UPDATED,
       updatedProduct
     );
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     return response.error(
       res,
       req.languageCode,
@@ -242,6 +337,7 @@ export const updateProduct = async (req, res) => {
     );
   }
 };
+
 
 // Delete
 export const deleteProduct = async (req, res) => {
@@ -310,6 +406,126 @@ export const searchProduct = async (req, res) => {
     );
   }
 };
+export const getPopularProducts = async (req, res) => {
+  try {
+    const orders = await orderModel.find({}, "items.productId");
+    console.log("Orders11:", orders);
+
+    if (!orders || orders.length === 0) {
+      return response.error(
+        res,
+        req.languageCode,
+        resStatusCode.NOT_FOUND,
+        "No orders found"
+      );
+    }
+
+    const productIds = [
+      ...new Set(
+        orders.flatMap((order) =>
+          order.items
+            .map((item) => item.productId?.toString())
+            .filter((id) => id)
+        )
+      ),
+    ];
+    console.log("productIds21", productIds);
+    if (productIds.length === 0) {
+      return response.error(
+        res,
+        req.languageCode,
+        resStatusCode.NOT_FOUND,
+        "No product IDs found in orders"
+      );
+    }
+
+    const objectIds = productIds.map((id) => new mongoose.Types.ObjectId(id));
+    console.log("ObjectIds for products:", objectIds);
+
+    const products = await productModel.find({ _id: { $in: objectIds } });
+    console.log("products", products);
+
+    if (!products || products.length === 0) {
+      return response.error(
+        res,
+        req.languageCode,
+        resStatusCode.NOT_FOUND,
+        "No matching products found"
+      );
+    }
+
+    return response.success(
+      res,
+      req.languageCode,
+      resStatusCode.ACTION_COMPLETE,
+      "Popular products fetched successfully",
+      products
+    );
+  } catch (error) {
+    console.error("Error fetching popular products:", error.message);
+    return response.error(
+      res,
+      req.languageCode,
+      resStatusCode.INTERNAL_SERVER_ERROR,
+      resMessage.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+
+// export const addDailyDeal = async (req, res) => {
+//   try {
+//     const { error } = dailyDealValidation.validate(req.body);
+//     if (error) {
+//       return response.error(
+//         res,
+//         req.languageCode,
+//         resStatusCode.BAD_REQUEST,
+//         error.details[0].message
+//       );
+//     }
+
+//     const { productId, salePrice, isActive } = req.body;
+
+//     // Validate product exists
+//     const product = await productModel.findById(productId);
+//     if (!product) {
+//       return response.error(
+//         res,
+//         req.languageCode,
+//         resStatusCode.NOT_FOUND,
+//         resMessage.NOT_FOUND
+//       );
+//     }
+
+//     const newDeal = await dailydealModels.create({
+//       productId,
+//       salePrice,
+//       isActive,
+//     });
+
+//     return response.success(
+//       res,
+//       req.languageCode,
+//       resStatusCode.ACTION_COMPLETE,
+//       resMessage.ADD_SUCCESS,
+//       {
+//         salePrice: newDeal.salePrice,
+//         isActive: newDeal.isActive,
+//         createdAt: newDeal.createdAt,
+//         updatedAt: newDeal.updatedAt,
+//       }
+//     );
+//   } catch (err) {
+//     console.error("Error adding daily deal:", err);
+//     return response.error(
+//       res,
+//       req.languageCode,
+//       resStatusCode.INTERNAL_SERVER_ERROR,
+//       resMessage.INTERNAL_SERVER_ERROR
+//     );
+//   }
+// };
 
 // import {
 //   subcategoryModel,

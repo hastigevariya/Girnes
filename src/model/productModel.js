@@ -26,6 +26,16 @@ const productSchema = new mongoose.Schema(
 
 export const productModel = mongoose.model("products", productSchema);
 
+const dailydealSchema = new mongoose.Schema(
+  {
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "products", required: true, },
+    salePrice: { type: Number },
+    isActive: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
+export const dailydealModels = mongoose.model("dailydeals", dailydealSchema);
+
 import Joi from "joi";
 
 export const productValidation = Joi.object({
@@ -98,6 +108,48 @@ export const productValidation = Joi.object({
   isActive: Joi.boolean().default(true),
 
   isDelete: Joi.boolean().default(false),
+});
+
+
+
+export const dailyDealValidation = Joi.object({
+  productId: Joi.string().required().messages({
+    "string.base": "Product ID must be a string",
+    "string.empty": "Product ID is required",
+    "any.required": "Product ID is required",
+  }),
+  salePrice: Joi.number().min(0).required().messages({
+    "number.base": "Sale price must be a number",
+    "number.min": "Sale price must be at least 0",
+    "any.required": "Sale price is required",
+  }),
+  isActive: Joi.boolean().optional(),
+});
+
+export const updateProductValidation = Joi.object({
+  title: Joi.string().min(3).max(200).optional(),
+  price: Joi.number().positive().optional(),
+  mrp: Joi.number().positive().optional(),
+  // bulletPoint: Joi.array().items(Joi.string().trim().min(1)).optional(),
+  bulletPoint: Joi.array()
+    .items(Joi.string().trim().min(1).required())
+    .required()
+    .messages({
+      "array.base": "Bullet points must be an array",
+      "array.includes": "Each bullet point must be a non-empty string",
+      "any.required": "Bullet points are required",
+    }),
+  quantity: Joi.number().integer().min(0).optional(),
+  stock: Joi.number().integer().min(0).optional(),
+  subcategoryId: Joi.string().length(24).hex().optional(),
+  tag: Joi.string().optional(),
+  description: Joi.string().optional(),
+  image: Joi.string().pattern(/\.(jpg|jpeg|png|gif|webp)$/i).optional(),
+  sku: Joi.string().optional(),
+  isActive: Joi.boolean().optional(),
+  isDelete: Joi.boolean().optional(),
+  isSale: Joi.boolean().optional(),
+  dailySalePrice: Joi.number().optional(),
 });
 
 // import mongoose from "mongoose";

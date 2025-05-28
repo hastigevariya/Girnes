@@ -8,111 +8,25 @@ export async function addCategory(req, res) {
   const { name } = req.body;
   const { error } = categoryValidation.validate(req.body);
   if (error) {
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.CLIENT_ERROR,
-      error.details[0].message
-    );
+    return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
   }
 
   try {
-    const existing = await categoryModel.findOne({
-      name,
-    });
+    const existing = await categoryModel.findOne({ name });
     if (existing?.name) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.CONFLICT,
-        resMessage.ALREADY_EXISTS,
-        {}
-      );
+      return response.error(res, req.languageCode, resStatusCode.CONFLICT, resMessage.ALREADY_EXISTS, {});
     }
 
     const newCategory = await categoryModel.create({
       name,
     });
 
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      resMessage.CATEGORY_CREATED,
-      newCategory
-    );
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.CATEGORY_CREATED, newCategory);
   } catch (error) {
     console.error(error);
-    return response.error(
-      res,
-      req?.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR
-    );
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
   }
 }
-export const getPopularProducts = async (req, res) => {
-  try {
-    const orders = await orderModel.find({}, "items.productId");
-
-    if (!orders || orders.length === 0) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.NOT_FOUND,
-        "No orders found"
-      );
-    }
-
-    const productIds = [
-      ...new Set(
-        orders
-          .flatMap((order) =>
-            order.items.map((item) => item.productId?.toString())
-          )
-          .filter((id) => id)
-      ),
-    ];
-
-    if (productIds.length === 0) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.NOT_FOUND,
-        "No product IDs found in orders"
-      );
-    }
-
-    const objectIds = productIds.map((id) => new mongoose.Types.ObjectId(id));
-
-    const products = await productModel.find({ _id: { $in: objectIds } });
-
-    if (!products || products.length === 0) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.NOT_FOUND,
-        "No matching products found"
-      );
-    }
-
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      "Popular products fetched successfully",
-      products
-    );
-  } catch (error) {
-    console.error("Error fetching popular products:", error.message);
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR
-    );
-  }
-};
 
 // export async function getCategoryList(req, res) {
 //   try {
@@ -155,21 +69,10 @@ export async function getCategoryList(req, res) {
       },
     ]);
 
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      resMessage.CATEGORY_LIST_FETCHED,
-      categories
-    );
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.CATEGORY_LIST_FETCHED, categories);
   } catch (err) {
     console.error(err);
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR
-    );
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
   }
 }
 
