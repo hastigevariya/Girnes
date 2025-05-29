@@ -132,13 +132,18 @@ export const productValidation = Joi.object({
     "any.required": "Description is required",
   }),
 
-  image: Joi.string()
-    .pattern(/\.(jpg|jpeg|png|gif|webp)$/i)
-    .optional()
-    .messages({
-      "string.pattern.base":
-        "Image must be a valid image file (jpg, jpeg, png, gif, webp)",
-    }),
+  // image: Joi.string()
+  //   .pattern(/\.(jpg|jpeg|png|gif|webp)$/i)
+  //   .optional()
+  //   .messages({
+  //     "string.pattern.base":
+  //       "Image must be a valid image file (jpg, jpeg, png, gif, webp)",
+  //   }),
+
+  image: Joi.array().items(
+    Joi.string().pattern(/\.(jpg|jpeg|png|gif|webp)$/i)
+  ).optional(),
+
 
   sku: Joi.string().optional(),
 

@@ -14,7 +14,7 @@ import { productImage } from "../utils/multer.js";
 
 router.post(
   "/createProduct",
-  productImage.fields([{ name: "image" }]),
+  productImage.array("image", 5),
   createProduct
 );
 router.get("/getAllProduct", getAllProducts);

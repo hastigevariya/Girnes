@@ -105,7 +105,16 @@ export const createProduct = async (req, res) => {
         });
       }
     }
-    return response.success(
+    const uploadedFiles = Array.isArray(req.files)
+      ? req.files.map(file => file.filename)
+      : [];
+
+
+    if (uploadedFiles.length > 0) {
+      newProduct.image = uploadedFiles;
+      await newProduct.save();
+    }
+    response.success(
       res,
       req.languageCode,
       resStatusCode.ACTION_COMPLETE,
@@ -396,7 +405,7 @@ export const updateProduct = async (req, res) => {
     let updatedImages = existingProduct.image || [];
 
     if (uploadedFiles.length > 0) {
-      updatedImages = [...updatedImages, ...uploadedFiles]; // Merge
+      updatedImages = uploadedFiles;
     }
 
     // Apply to update
