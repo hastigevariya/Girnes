@@ -37,3 +37,73 @@ export async function getSubCategoryList(req, res) {
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
   }
 };
+
+// Update SubCategory
+export async function updateSubCategory(req, res) {
+  const { subCategoryId } = req.params;
+  const { name, categoryId } = req.body;
+
+  if (!subCategoryId || !name || !categoryId) {
+    return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR,);
+  }
+
+  try {
+    const updatedSubCategory = await subCategoryModel.findByIdAndUpdate(
+      subCategoryId,
+      { name, categoryId },
+      { new: true }
+    );
+
+    if (!updatedSubCategory) {
+      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, "Subcategory not found");
+    }
+
+    return response.success(
+      res,
+      req.languageCode,
+      resStatusCode.ACTION_COMPLETE,
+      resMessage.SUBCATEGORY_UPDATED,
+      updatedSubCategory
+    );
+  } catch (err) {
+    console.error(err);
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
+  }
+};
+
+export const inActiveSubCategory = async (req, res) => {
+  const { subCategoryId } = req.params;
+
+  try {
+    const updated = await subCategoryModel.findByIdAndUpdate(
+      subCategoryId,
+      { isActive: true },
+      { new: true }
+    );
+
+    if (!updated) {
+      return response.error(
+        res,
+        req.languageCode,
+        resStatusCode.NOT_FOUND,
+        resMessage.NOT_FOUND
+      );
+    }
+
+    return response.success(
+      res,
+      req.languageCode,
+      resStatusCode.ACTION_COMPLETE,
+      "Subcategory activated successfully",
+      updated
+    );
+  } catch (err) {
+    console.error(err);
+    return response.error(
+      res,
+      req.languageCode,
+      resStatusCode.INTERNAL_SERVER_ERROR,
+      resMessage.INTERNAL_SERVER_ERROR
+    );
+  }
+};

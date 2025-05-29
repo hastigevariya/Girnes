@@ -42,6 +42,7 @@ export const resMessage = {
   ORDER_UPDATED: "Order updated successfully.",
   ORDER_NOT_FOUND: "Order not found.",
   NO_ORDERS_FOUND: "No orders found for the user.",
+  CATEGORY_NOT_FOUND: "Category not found",
   // PRODUCT_CREATED: "Product created successfully.",
   // PRODUCT_LIST_FETCHED: "Product list fetched successfully.",
   // ORDER_PLACED: "Order placed successfully.",
@@ -68,6 +69,10 @@ export const resMessage = {
   ALREADY_EXISTS: "This item already exists.",
   INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
   ACTION_COMPLETE: "Action completed successfully.",
+  SUBCATEGORY_UPDATED: "Subcategory updated successfully",
+  CLIENT_ERRO: "All fields are required",
+  NOT_FOUND: "Subcategory not found",
+  SUBCATEGORY_INACTIVATED: "Subcategory marked as inactive",
 
   CART_UPDATED: "Cart updated successfully.",
   CART_CREATED: "Cart created successfully.",

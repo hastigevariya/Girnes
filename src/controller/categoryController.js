@@ -55,3 +55,64 @@ export async function getCategoryList(req, res) {
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
   }
 };
+
+// updateCategory
+export async function updateCategory(req, res) {
+  const { categoryId } = req.params;
+  const { name } = req.body;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return response.error(res, req.languageCode, resStatusCode.BAD_REQUEST, "Invalid category ID");
+    }
+
+    const existing = await categoryModel.findById(categoryId);
+    if (!existing) {
+      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.CATEGORY_NOT_FOUND);
+    }
+
+    existing.name = name || existing.name;
+    const updatedCategory = await existing.save();
+
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.CATEGORY_UPDATED, updatedCategory);
+  } catch (err) {
+    console.error(err);
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
+  }
+};
+export async function inActiveCategory(req, res) {
+  const { categoryId } = req.params;
+  const { isActive } = req.body;
+
+  // Optional: Validate isActive is boolean
+  if (typeof isActive !== 'boolean') {
+    return response.error(res, req.languageCode, resStatusCode.BAD_REQUEST, "`isActive` must be true or false");
+  }
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return response.error(res, req.languageCode, resStatusCode.BAD_REQUEST, "Invalid category ID");
+    }
+
+    const existing = await categoryModel.findById(categoryId);
+    if (!existing) {
+      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.CATEGORY_NOT_FOUND);
+    }
+
+    existing.isActive = isActive;
+    const updatedCategory = await existing.save();
+
+    const statusMessage = isActive ? "activated" : "inactivated";
+
+    return response.success(
+      res,
+      req.languageCode,
+      resStatusCode.ACTION_COMPLETE,
+      `Category ${statusMessage} successfully`,
+      updatedCategory
+    );
+  } catch (err) {
+    console.error(err);
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
+  }
+}
