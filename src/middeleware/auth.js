@@ -36,8 +36,10 @@ export const authenticateUser = async (req, res, next) => {
       issuer: "tracking",
       expiresIn: "30d",
     });
-
-    const user = await userModel.findById(decoded.id);
+    console.log('decoded', decoded);
+    const _id = decoded?._id || decoded?.id;
+    const user = await userModel.findById(_id);
+    console.log('user', user);
     req.user = user;
     if (!user) {
       return res.status(401).json({

@@ -8,6 +8,8 @@ export const resMessage = {
   USER_NOT_FOUND: "USER_NOT_FOUND",
   INVALID_PASSWORD: "INVALID_PASSWORD",
   ALREADY_EXISTS: "ALREADY_EXISTS",
+  UPDATE_SUCCESS: "User updated successfully",
+  FETCH_SUCCESS: "Users fetched successfully",
 
   PRODUCT_CREATED: "Product created successfully",
   PRODUCT_LIST_FETCHED: "Product list fetched successfully",
@@ -17,6 +19,12 @@ export const resMessage = {
   NOT_FOUND: "Product not found",
   ALREADY_EXISTS: "Product already exists",
   INTERNAL_SERVER_ERROR: "Something went wrong",
+  PRODUCT_NOT_FOUND: "No products matched your search.",
+  PRODUCT_FOUND: "Products found successfully.",
+  NO_ORDERS: "No orders found.",
+  NO_PRODUCT_IDS: "No product IDs found in orders.",
+  POPULAR_PRODUCTS_FOUND: "Popular products fetched successfully.",
+  POPULAR_PRODUCTS_NOT_FOUND: "No matching products found.",
   // SUBCATEGORY_CREATED: "Subcategory created successfully",
   // SUBCATEGORY_LIST_FETCHED: "Subcategory list fetched successfully",
   // SUBCATEGORY_FETCHED: "Subcategory fetched successfully",
@@ -105,6 +113,7 @@ export const resMessage = {
   ALREADY_EXISTS: "Already exists",
   CATEGORY_CREATED: "Category created successfully",
   CATEGORY_LIST_FETCHED: "Category list fetched successfully",
+
 };
 
 export const resStatusCode = {

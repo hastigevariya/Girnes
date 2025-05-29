@@ -1,176 +1,90 @@
-import {
-  userModel,
-  userRegisterValidation,
-  userLoginValidation,
-} from "../model/userModel.js";
+import { userModel, userRegisterValidation, userLoginValidation, } from "../model/userModel.js";
 import { generateToken } from "../middeleware/auth.js";
 import response from "../utils/response.js";
 import { hash, compare } from "bcrypt";
 import { resStatusCode, resMessage } from "../utils/constants.js";
 
+// register
 export async function register(req, res) {
   console.log("REQ BODY:", req.body);
   const { fname, lname, email, password } = req.body;
   const { error } = userRegisterValidation.validate(req.body);
   if (error) {
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.CLIENT_ERROR,
-      error.details[0].message
-    );
-  }
+    return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+  };
   try {
     const userExists = await userModel.findOne({ email });
     if (userExists?.email) {
-      return response.error(
-        res,
-        req?.languageCode,
-        resStatusCode.CONFLICT,
-        resMessage.USER_FOUND,
-        {}
-      );
-    }
+      return response.error(res, req?.languageCode, resStatusCode.CONFLICT, resMessage.USER_FOUND, {});
+    };
     const hashedPassword = await hash(password, 10);
-    const createNewUser = userModel.create({
-      fname,
-      lname,
-      email,
-      password: hashedPassword,
-    });
+    const createNewUser = await userModel.create({ fname, lname, email, password: hashedPassword, });
+
     const token = await generateToken({ _id: createNewUser._id });
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      resMessage.USER_REGISTER,
-      { _id: createNewUser._id, token: token }
-    );
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.USER_REGISTER, { _id: createNewUser._id, token: token });
   } catch (error) {
     console.error(error);
-    return response.error(
-      res,
-      req?.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR,
-      {}
-    );
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   }
-}
+};
 
+// login
 export async function login(req, res) {
   const { email, password } = req.body;
   const { error } = userLoginValidation.validate(req.body);
   if (error) {
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.CLIENT_ERROR,
-      error.details[0].message
-    );
-  }
+    return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+  };
   try {
     const user = await userModel.findOne({ email, isActive: true });
     if (!user) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.FORBIDDEN,
-        resMessage.USER_ACCOUNT_NOT_FOUND,
-        {}
-      );
-    }
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.USER_ACCOUNT_NOT_FOUND, {});
+    };
     const validPassword = await compare(password, user.password);
     if (!validPassword) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.UNAUTHORISED,
-        resMessage.INVALID_PASSWORD,
-        {}
-      );
-    }
-    const token = await generateToken({ id: user._id });
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      resMessage.LOGIN_SUCCESS,
-      { _id: user._id, token: token }
-    );
+      return response.error(res, req.languageCode, resStatusCode.UNAUTHORISED, resMessage.INVALID_PASSWORD, {});
+    };
+    const token = await generateToken({ _id: user._id });
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.LOGIN_SUCCESS, { _id: user._id, token: token });
   } catch (err) {
     console.error(err);
-    return response.error(
-      res,
-      req?.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR,
-      {}
-    );
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   }
-}
+};
 
+// profile
 export async function profile(req, res) {
   try {
-    const user = await userModel
-      .findById({ _id: req.user.id })
-      .select("-password");
+    const user = await userModel.findById({ _id: req.user.id }).select("-password");
     if (!user) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.FORBIDDEN,
-        resMessage.USER_NOT_FOUND,
-        {}
-      );
-    }
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.USER_NOT_FOUND, {});
+    };
+
     const updatedUser = {
       ...user._doc,
       profilePhoto: user?.profilePhoto
         ? `/userProfile/${user?.profilePhoto}`
         : null,
     };
-    return response.success(
-      res,
-      req?.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      resMessage.RETRIEVE_PROFILE_SUCCESS,
-      updatedUser
-    );
+    return response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.RETRIEVE_PROFILE_SUCCESS, updatedUser);
   } catch (err) {
     console.error(err);
-    return response.error(
-      res,
-      req?.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR,
-      {}
-    );
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   }
-}
+};
 
+// getAllUsers
 export async function getAllUsers(req, res) {
   try {
-    const users = await userModel.find({}, "-password"); // exclude password
-    return response.success(
-      res,
-      req?.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      resMessage.FETCH_SUCCESS || "Users fetched successfully",
-      users
-    );
+    const users = await userModel.find({}, "-password");
+    return response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.FETCH_SUCCESS, users);
   } catch (err) {
     console.error(err);
-    return response.error(
-      res,
-      req?.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR,
-      {}
-    );
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   }
-}
+};
 
+// updateUser
 export async function updateUser(req, res) {
   const {
     fname,
@@ -186,14 +100,8 @@ export async function updateUser(req, res) {
   try {
     const user = await userModel.findById({ _id: req.user._id });
     if (!user) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.NOT_FOUND,
-        resMessage.USER_NOT_FOUND,
-        {}
-      );
-    }
+      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.USER_NOT_FOUND, {});
+    };
 
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user.id,
@@ -213,21 +121,9 @@ export async function updateUser(req, res) {
       { new: true, runValidators: true }
     );
 
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      resMessage.UPDATE_SUCCESS || "User updated successfully",
-      updatedUser
-    );
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.UPDATE_SUCCESS, updatedUser);
   } catch (err) {
     console.error(err);
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR,
-      {}
-    );
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   }
-}
+};

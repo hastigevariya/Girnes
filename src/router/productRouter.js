@@ -11,49 +11,19 @@ import {
   //addDailyDeal
 } from "../controller/productController.js";
 import { productImage } from "../utils/multer.js";
+import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 
 router.post(
-  "/createProduct",
-  productImage.array("image", 5),
-  createProduct
-);
-router.get("/getAllProduct", getAllProducts);
-router.get("/getProductById/:id", getProductById);
-//router.put("/update/:id", updateProduct);
-router.put("/updateProduct/:id", productImage.fields([{ name: 'image' }]), updateProduct);
-//router.put('/admin/updateProduct/:id', productImage.fields([{ name: 'image' }]), validateAccessToken, authorizeRoles("admin"), productController.updateSingleProduct);
-router.delete("/delete/:id", deleteProduct);
-router.get("/searchProduct/:searchProduct", searchProduct);
+  "/createProduct", productImage.array("image", 5), authenticateUser, authorizeUserRoles('admin'), createProduct);
+router.get("/getAllProduct", authenticateUser, getAllProducts);
+router.get("/getProductById/:id", authenticateUser, getProductById);
 
-router.get("/popularproducts", getPopularProducts);
-//router.post("/dailaydeal", addDailyDeal)
+router.put("/updateProduct/:id", productImage.fields([{ name: 'image' }]), authenticateUser, authorizeUserRoles('admin'), updateProduct);
+
+
+router.delete("/delete/:id", authenticateUser, authorizeUserRoles('admin'), deleteProduct);
+router.get("/searchProduct/:searchProduct", authenticateUser, searchProduct);
+
+router.get("/popularproducts", authenticateUser, authorizeUserRoles('admin'), getPopularProducts);
 
 export default router;
-
-// import express from "express";
-// const router = express.Router();
-
-// import {
-//   createSubcategory,
-//   getAllSubcategories,
-//   getSubcategoryById,
-//   updateSubcategory,
-//   deleteSubcategory,
-//   searchSubcategory,
-// } from "../controller/productController.js";
-
-// import { productImage } from "../utils/multer.js"; // Assuming subcategory uses image upload too
-
-// router.post(
-//   "/createSubcategory",
-//   productImage.fields([{ name: "image" }]),
-//   createSubcategory
-// );
-
-// router.get("/getAllSubcategories", getAllSubcategories);
-// router.get("/getSubcategoryById/:id", getSubcategoryById);
-// router.put("/update/:id", updateSubcategory);
-// router.delete("/delete/:id", deleteSubcategory);
-// router.get("/searchSubcategory/:searchTerm", searchSubcategory);
-
-// export default router;
