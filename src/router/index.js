@@ -11,14 +11,14 @@ import bannerRoutes from "./bannerRoutes.js";
 
 const router = Router();
 
-router.use("/user", userRoutes);
-router.use("/admin/product", productRoutes);
-router.use("/admin/category", categoryRoutes);
-router.use("/admin/subcategory", subcategoryRouter);
+router.use("/auth", userRoutes);
+router.use("/product", productRoutes);
+router.use("/category", categoryRoutes);
+router.use("/subcategory", subcategoryRouter);
 router.use("/user/order", orderRoutes);
 router.use("/user/cart", cartRoutes);
 router.use("/user/wishlist", wishlistRoutes);
-router.use("/admin/media", mediaRoutes);
-router.use("/admin/banner", bannerRoutes);
+router.use("/media", mediaRoutes);
+router.use("/banner", bannerRoutes);
 
 export default router;

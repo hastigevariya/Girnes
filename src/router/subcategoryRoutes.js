@@ -7,7 +7,7 @@ import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 
 const router = express.Router();
 
-router.post("/addSubCategory", authenticateUser, authorizeUserRoles('admin'), addSubCategory);
-router.get("/getSubCategoryList", authenticateUser, authorizeUserRoles('admin'), getSubCategoryList);
+router.post("/admin/addSubCategory", authenticateUser, authorizeUserRoles('admin'), addSubCategory);
+router.get("/admin/getSubCategoryList", authenticateUser, authorizeUserRoles('admin'), getSubCategoryList);
 
 export default router;

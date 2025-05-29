@@ -13,10 +13,6 @@ router.post("/addToCart", authenticateUser, addToCart);
 router.get("/getUserCart", authenticateUser, getUserCart);
 router.put("/updateCart/:productId", authenticateUser, updateCart);
 
-router.delete(
-  "/deleteCartByProductId/:productId",
-  authenticateUser,
-  deleteCartByProductId
-);
+router.delete("/deleteCartByProductId/:productId", authenticateUser, deleteCartByProductId);
 
 export default router;
