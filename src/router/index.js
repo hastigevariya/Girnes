@@ -11,6 +11,7 @@ import bannerRoutes from "./bannerRoutes.js";
 import aboutRoutes from "./aboutRoutes.js";
 import reviewRoutes from "./reviewRoutes.js";
 import contactRoutes from "./contactRoutes.js";
+import instashopRoutes from "./instashopRoutes.js";
 
 const router = Router();
 router.use("/auth", userRoutes);
@@ -25,5 +26,6 @@ router.use("/banner", bannerRoutes);
 router.use("/about", aboutRoutes);
 router.use("/review", reviewRoutes);
 router.use("/contact", contactRoutes);
+router.use("/instashop", instashopRoutes);
 
 export default router;
