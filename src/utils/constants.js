@@ -126,6 +126,11 @@ export const resMessage = {
   ABOUT_FETCHED: "About Us fetched successfully",
   INTERNAL_SERVER_ERROR: "Oops! Something went wrong. Our team is looking into it.",
 
+  REVIEW_SUBMITTED: "Thank you! Your review has been submitted successfully.",
+  REVIEW_ALREADY_SUBMITTED: "You have already submitted a review for this product.",
+  REVIEW_UPDATED: "Your review has been updated successfully.",
+  INTERNAL_SERVER_ERROR: "Oops! Something went wrong. Our team is looking into it.",
+
 };
 
 export const resStatusCode = {
