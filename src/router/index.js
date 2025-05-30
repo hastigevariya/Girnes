@@ -9,6 +9,7 @@ import wishlistRoutes from "./wishlistRoutes.js";
 import mediaRoutes from "./mediaRoutes.js";
 import bannerRoutes from "./bannerRoutes.js";
 import aboutRoutes from "./aboutRoutes.js"
+import reviewRoutes from "./reviewRoutes.js"
 
 const router = Router();
 router.use("/auth", userRoutes);
@@ -20,6 +21,7 @@ router.use("/user/cart", cartRoutes);
 router.use("/user/wishlist", wishlistRoutes);
 router.use("/media", mediaRoutes);
 router.use("/banner", bannerRoutes);
-router.use("/about", aboutRoutes)
+router.use("/about", aboutRoutes);
+router.use("/review", reviewRoutes);
 
 export default router;
