@@ -8,8 +8,9 @@ import cartRoutes from "./cartRoutes.js";
 import wishlistRoutes from "./wishlistRoutes.js";
 import mediaRoutes from "./mediaRoutes.js";
 import bannerRoutes from "./bannerRoutes.js";
-import aboutRoutes from "./aboutRoutes.js"
-import reviewRoutes from "./reviewRoutes.js"
+import aboutRoutes from "./aboutRoutes.js";
+import reviewRoutes from "./reviewRoutes.js";
+import contactRoutes from "./contactRoutes.js";
 
 const router = Router();
 router.use("/auth", userRoutes);
@@ -23,5 +24,6 @@ router.use("/media", mediaRoutes);
 router.use("/banner", bannerRoutes);
 router.use("/about", aboutRoutes);
 router.use("/review", reviewRoutes);
+router.use("/contact", contactRoutes);
 
 export default router;

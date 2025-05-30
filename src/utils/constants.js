@@ -131,6 +131,13 @@ export const resMessage = {
   REVIEW_UPDATED: "Your review has been updated successfully.",
   INTERNAL_SERVER_ERROR: "Oops! Something went wrong. Our team is looking into it.",
 
+  CONTACT_SUBMITTED: "Contact form submitted successfully",
+  CONTACT_FETCHED: "Customer queries fetched successfully",
+  COMPANY_CREATED: "Company info created successfully",
+  COMPANY_UPDATED: "Company info updated successfully",
+  COMPANY_FETCHED: "Company info retrieved successfully",
+  NO_COMPANY_FOUND: "No company info found",
+  INTERNAL_SERVER_ERROR: "Oops! Something went wrong. Our team is looking into it.",
 };
 
 export const resStatusCode = {
