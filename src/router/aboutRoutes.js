@@ -7,6 +7,6 @@ const router = express.Router();
 import { bannerImageUpload } from "../utils/commonFunctions.js";
 
 router.post("/admin/addAbout", bannerImageUpload.single("image"), authenticateUser, authorizeUserRoles("admin"), addAbout);
-router.get("/getAbout", authenticateUser, authorizeUserRoles, getAbout);
+router.get("/getAbout", authenticateUser, getAbout);
 
 export default router;
