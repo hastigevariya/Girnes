@@ -1,13 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import {
-  addBanner,
-  getAllBanner,
-  adminGetAllBanner,
-  deleteBannerById,
-  inActiveBannerById,
-} from "../controller/bannerController.js";
+import { addBanner, getAllBanner, adminGetAllBanner, deleteBannerById, inActiveBannerById, } from "../controller/bannerController.js";
 
 import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 
