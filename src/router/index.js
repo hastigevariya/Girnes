@@ -10,7 +10,6 @@ import mediaRoutes from "./mediaRoutes.js";
 import bannerRoutes from "./bannerRoutes.js";
 
 const router = Router();
-
 router.use("/auth", userRoutes);
 router.use("/product", productRoutes);
 router.use("/category", categoryRoutes);

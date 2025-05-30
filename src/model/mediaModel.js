@@ -43,7 +43,7 @@ const mediaValidation = Joi.object({
 // Video Validation
 const videoValidation = Joi.object(
   {
-    vdoUrl: Joi.string().min(1).required().messages({
+    vdoUrl: Joi.string().uri().min(1).required().messages({
       "string.base": "Video URL must be a valid string.",
       "string.empty": "Video URL cannot be empty.",
       "string.min": "Video URL must be at least 1 character long.",

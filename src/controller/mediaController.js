@@ -3,31 +3,46 @@ import response from "../utils/response.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
 
 // addMedia
-export const addMedia = async (req, res) => {
+export async function addMedia(req, res) {
   try {
-    let image = [];
-
-    if (req.files) {
-      image = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+    console.log('req.files:', req.files);
+    let imageFiles = [];
+    // if (req.files) {
+    //   image = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+    // } else if (req.file) {
+    //   image = [req.file];
+    // }
+    if (req.files && req.files.image) {
+      // multer with .fields([{name: "image"}]) sends files under req.files.image as an array
+      imageFiles = req.files.image;
     } else if (req.file) {
-      image = [req.file];
-    };
+      imageFiles = [req.file];
+    }
 
-    const savedMedia = await Promise.all(
-      image.map(async (file) => {
-        const { error } = mediaValidation.validate({ image: [file?.filename] });
-        if (error) {
-          return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
-        }
-        return mediaModel.create({ file: file.filename, type: "img", });
-      }));
+    if (imageFiles.length === 0) {
+      return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, "No files uploaded");
+    }
 
-    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.MEDIA_UPLOADED, savedMedia);
+    const savedMedia = [];
+
+    for (const file of imageFiles) {
+      const { error } = mediaValidation.validate({ image: [file?.filename] });
+      if (error) {
+        return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+      }
+      const media = await mediaModel.create({
+        file: file.filename,
+        type: 'img',
+      });
+      savedMedia.push(media);
+    }
+
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.MEDIA_UPLOADED_SUCCESSFULLY, savedMedia);
   } catch (err) {
     console.error(err);
-    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   }
-};
+}
 
 
 // adminGetAllMedia

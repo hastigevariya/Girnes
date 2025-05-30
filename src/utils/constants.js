@@ -93,7 +93,7 @@ export const resMessage = {
   INTERNAL_SERVER_ERROR:
     "Oops! Something went wrong. Our team is looking into it.",
 
-  MEDIA_UPLOADED: "Media uploaded successfully.",
+
   MEDIA_RETRIEVED: "Media retrieved successfully.",
   NO_MEDIA_FOUND: "No media found.",
   MEDIA_DELETED: "Media deleted successfully.",
@@ -108,6 +108,8 @@ export const resMessage = {
   ALREADY_EXISTS: "Category already exists.",
   CATEGORY_CREATED: "Category created successfully.",
   CATEGORY_LIST_FETCHED: "Category list fetched successfully.",
+  MEDIA_UPLOADED_SUCCESSFULLY: 'Media uploaded successfully',
+
 
   BANNER_CREATED: "Banner created successfully",
   BANNER_LIST_FETCHED: "Banner list fetched successfully",
@@ -118,6 +120,11 @@ export const resMessage = {
   ALREADY_EXISTS: "Already exists",
   CATEGORY_CREATED: "Category created successfully",
   CATEGORY_LIST_FETCHED: "Category list fetched successfully",
+
+  ABOUT_CREATED: "About Us created successfully",
+  ABOUT_UPDATED: "About Us updated successfully",
+  ABOUT_FETCHED: "About Us fetched successfully",
+  INTERNAL_SERVER_ERROR: "Oops! Something went wrong. Our team is looking into it.",
 
 };
 
