@@ -15,15 +15,15 @@ export const addInstaShop = async (req, res) => {
             );
         }
 
-        const newPost = new InstaShop({ image, url, isActive });
-        const savedPost = await newPost.save();
+        const newShop = new InstaShop({ image, url, isActive });
+        const savedShop = await newShop.save();
 
         return response.success(
             res,
             req.languageCode,
             resStatusCode.ACTION_COMPLETE,
-            resMessage.INSTA_POST_CREATED,
-            savedPost
+            resMessage.INSTA_SHOP_CREATED,
+            savedShop
         );
     } catch (error) {
         console.error("Error in addInstaShop:", error);
@@ -38,14 +38,14 @@ export const addInstaShop = async (req, res) => {
 
 export const getAllInstaShops = async (req, res) => {
     try {
-        const posts = await InstaShop.find().sort({ createdAt: -1 });
+        const Shops = await InstaShop.find().sort({ createdAt: -1 });
 
         return response.success(
             res,
             req.languageCode,
             resStatusCode.ACTION_COMPLETE,
-            resMessage.INSTA_POST_FETCHED,
-            posts
+            resMessage.INSTA_SHOP_FETCHED,
+            Shops
         );
     } catch (error) {
         console.error("Error in getAllInstaShops:", error);
@@ -71,15 +71,16 @@ export const updateInstaShopStatus = async (req, res) => {
             return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR);
         }
 
-        const updatedPost = await InstaShop.findByIdAndUpdate(id, { isActive }, { new: true });
+        const updatedShop = await InstaShop.findByIdAndUpdate(id, { isActive }, { new: true });
 
-        if (!updatedPost) {
+        if (!updatedShop) {
             return response.error(res, req.languageCode, resStatusCode.NOT_FOUND);
         }
 
-        return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, updatedPost);
+        return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, updatedShop, {});
     } catch (error) {
         console.error("Error in updateInstaShopStatus:", error);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
     }
 };
+

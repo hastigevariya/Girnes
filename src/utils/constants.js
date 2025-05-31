@@ -139,8 +139,8 @@ export const resMessage = {
   NO_COMPANY_FOUND: "No company info found",
   INTERNAL_SERVER_ERROR: "Oops! Something went wrong. Our team is looking into it.",
 
-  INSTA_POST_CREATED: "Insta post created successfully",
-  INSTA_POST_FETCHED: "Insta posts fetched successfully",
+  INSTA_SHOP_CREATED: "Insta shop created successfully",
+  INSTA_SHOP_FETCHED: "Insta shops fetched successfully",
   REQUIRED_FIELDS: "Image and URL are required",
   INTERNAL_SERVER_ERROR: "Something went wrong"
 };
