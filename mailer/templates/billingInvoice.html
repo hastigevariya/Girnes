@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Billing Invoice</title>
+  </head>
+  <body>
+    <h2>Hello, <%= customerName %>!</h2>
+    <p>Thank you for your purchase. Here is your invoice:</p>
+
+    <table border="1" cellspacing="0" cellpadding="10">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach(item => { %>
+          <tr>
+            <td><%= item.name %></td>
+            <td><%= item.quantity %></td>
+            <td>₹<%= item.price %></td>
+            <td>₹<%= item.quantity * item.price %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+
+    <h3>Total Amount: ₹<%= totalAmount %></h3>
+    <p>Date: <%= date %></p>
+  </body>
+</html>

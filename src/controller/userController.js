@@ -3,7 +3,7 @@ import { generateToken } from "../middeleware/auth.js";
 import response from "../utils/response.js";
 import { hash, compare } from "bcrypt";
 import { resStatusCode, resMessage } from "../utils/constants.js";
-
+import sendMail from '../../mailer/index.js';
 // register
 export async function register(req, res) {
   console.log("REQ BODY:", req.body);
@@ -55,11 +55,13 @@ export async function login(req, res) {
 // profile
 export async function profile(req, res) {
   try {
+    console.log('dsfbhj');
     const user = await userModel.findById({ _id: req.user.id }).select("-password");
     if (!user) {
       return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.USER_NOT_FOUND, {});
     };
-
+    const ckemail = await sendMail("welcome-mail", "Welcome to Molimor Store", 'mihirkasodariya21@gmail.com', { name: "wdnk" });
+    console.log('ckemail', ckemail);
     const updatedUser = {
       ...user._doc,
       profilePhoto: user?.profilePhoto

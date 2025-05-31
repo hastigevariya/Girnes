@@ -7,7 +7,7 @@ import { saveUserProfile } from "../utils/multer.js";
 
 router.post("/register", register); // user
 router.post("/login", login); // user
-router.post("/profile", authenticateUser, profile); // user
+router.get("/profile", authenticateUser, profile); // user
 router.get("/admin/getUser/:id", authenticateUser, authorizeUserRoles("admin"), getUserById);
 
 
