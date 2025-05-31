@@ -84,6 +84,28 @@ export async function getAllUsers(req, res) {
   }
 };
 
+// getUserById
+export async function getUserById(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return response.error(res, req?.languageCode, resStatusCode.CLIENT_ERROR, resMessage.USER_ID_REQUIRED, {});
+    }
+
+    const user = await userModel.findById(id, "-password");
+
+    if (!user) {
+      return response.error(res, req?.languageCode, resStatusCode.NOT_FOUND, resMessage.NOT_FOUND, {});
+    }
+
+    return response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.FETCH_SUCCESS, user);
+  } catch (err) {
+    console.error("Error in getUserById:", err);
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
+  }
+}
+
 // updateUser
 export async function updateUser(req, res) {
   const {

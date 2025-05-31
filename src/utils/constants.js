@@ -10,6 +10,9 @@ export const resMessage = {
   ALREADY_EXISTS: "ALREADY_EXISTS",
   UPDATE_SUCCESS: "User updated successfully",
   FETCH_SUCCESS: "Users fetched successfully",
+  USER_ID_REQUIRED: "User ID is required",
+  ACTION_COMPLETE: "Action completed successfully",
+
 
   PRODUCT_CREATED: "Product created successfully",
   PRODUCT_LIST_FETCHED: "Product list fetched successfully",
