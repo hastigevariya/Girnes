@@ -9,25 +9,14 @@ export const addReview = async (req, res) => {
 
     const { error } = reviewValidation.validate(req.body);
     if (error) {
-        return response.error(
-            res,
-            req.languageCode,
-            resStatusCode.CLIENT_ERROR,
-            error.details[0].message
-        );
-    }
-
+        return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+    };
     try {
         const existsReview = await reviewModel.findOne({ productId, userId });
 
         if (existsReview) {
-            return response.error(
-                res,
-                req.languageCode,
-                resStatusCode.FORBIDDEN,
-                resMessage.REVIEW_ALREADY_SUBMITTED
-            );
-        }
+            return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.REVIEW_ALREADY_SUBMITTED);
+        };
 
         const addReview = await reviewModel.create({
             rating,
@@ -38,21 +27,10 @@ export const addReview = async (req, res) => {
             comment
         });
 
-        return response.success(
-            res,
-            req.languageCode,
-            resStatusCode.ACTION_COMPLETE,
-            resMessage.REVIEW_SUBMITTED,
-            addReview
-        );
+        return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.REVIEW_SUBMITTED, addReview);
     } catch (err) {
         console.error("Error in addReview:", err);
-        return response.error(
-            res,
-            req.languageCode,
-            resStatusCode.INTERNAL_SERVER_ERROR,
-            resMessage.INTERNAL_SERVER_ERROR
-        );
+        return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
     }
 };
 
@@ -63,35 +41,15 @@ export const inActiveReview = async (req, res) => {
 
     const { error } = inActiveValidation.validate(req.body);
     if (error) {
-        return response.error(
-            res,
-            req.languageCode,
-            resStatusCode.CLIENT_ERROR,
-            error.details[0].message
-        );
-    }
+        return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+    };
 
     try {
-        const updatedReview = await reviewModel.findOneAndUpdate(
-            { productId, userId },
-            { isActive },
-            { new: true }
-        );
+        const updatedReview = await reviewModel.findOneAndUpdate({ productId, userId }, { isActive }, { new: true });
 
-        return response.success(
-            res,
-            req.languageCode,
-            resStatusCode.ACTION_COMPLETE,
-            resMessage.REVIEW_UPDATED,
-            updatedReview
-        );
+        return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.REVIEW_UPDATED, updatedReview);
     } catch (err) {
         console.error("Error in inActiveReview:", err);
-        return response.error(
-            res,
-            req.languageCode,
-            resStatusCode.INTERNAL_SERVER_ERROR,
-            resMessage.INTERNAL_SERVER_ERROR
-        );
+        return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
     }
 };

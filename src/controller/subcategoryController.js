@@ -58,13 +58,7 @@ export async function updateSubCategory(req, res) {
       return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, "Subcategory not found");
     }
 
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      resMessage.SUBCATEGORY_UPDATED,
-      updatedSubCategory
-    );
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.SUBCATEGORY_UPDATED, updatedSubCategory);
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
@@ -75,35 +69,15 @@ export const inActiveSubCategory = async (req, res) => {
   const { subCategoryId } = req.params;
 
   try {
-    const updated = await subCategoryModel.findByIdAndUpdate(
-      subCategoryId,
-      { isActive: true },
-      { new: true }
-    );
+    const updated = await subCategoryModel.findByIdAndUpdate(subCategoryId, { isActive: true }, { new: true });
 
     if (!updated) {
-      return response.error(
-        res,
-        req.languageCode,
-        resStatusCode.NOT_FOUND,
-        resMessage.NOT_FOUND
-      );
+      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.NOT_FOUND);
     }
 
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      "Subcategory activated successfully",
-      updated
-    );
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, "Subcategory activated successfully", updated);
   } catch (err) {
     console.error(err);
-    return response.error(
-      res,
-      req.languageCode,
-      resStatusCode.INTERNAL_SERVER_ERROR,
-      resMessage.INTERNAL_SERVER_ERROR
-    );
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
   }
 };

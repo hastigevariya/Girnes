@@ -1,10 +1,5 @@
 import express from "express";
-import {
-  addSubCategory,
-  getSubCategoryList,
-  updateSubCategory,
-  inActiveSubCategory
-} from "../controller/subcategoryController.js";
+import { addSubCategory, getSubCategoryList, updateSubCategory, inActiveSubCategory } from "../controller/subcategoryController.js";
 import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 
 const router = express.Router();

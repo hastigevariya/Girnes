@@ -1,13 +1,7 @@
 import { Router } from "express";
 const router = Router();
 // import { saveUserProfile } from '../utils/multerStorage.js';
-import {
-  register,
-  login,
-  profile,
-  getAllUsers,
-  updateUser,
-} from "../controller/userController.js";
+import { register, login, profile, getAllUsers, updateUser, } from "../controller/userController.js";
 import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 import { saveUserProfile } from "../utils/multer.js";
 

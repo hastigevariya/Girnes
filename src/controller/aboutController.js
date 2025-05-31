@@ -2,7 +2,7 @@ import { aboutUsModel } from '../model/aboutModel.js';
 import response from "../utils/response.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
 
-
+// addAbout
 export const addAbout = async (req, res) => {
     try {
         const { p1, p2, p3, p4, m1, m2, m3, m4 } = req.body;
@@ -32,20 +32,9 @@ export const addAbout = async (req, res) => {
 export async function getAbout(req, res) {
     try {
         const aboutData = await aboutUsModel.find();
-        return response.success(
-            res,
-            req.languageCode,
-            resStatusCode.ACTION_COMPLETE,
-            resMessage.ABOUT_FETCHED,
-            aboutData
-        );
+        return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ABOUT_FETCHED, aboutData);
     } catch (error) {
         console.error(error);
-        return response.error(
-            res,
-            req.languageCode,
-            resStatusCode.INTERNAL_SERVER_ERROR,
-            resMessage.INTERNAL_SERVER_ERROR
-        );
+        return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
     }
-}
+};

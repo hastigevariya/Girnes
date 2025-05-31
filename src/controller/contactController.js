@@ -2,6 +2,7 @@ import { contactModel, contactValidation, companyinfoModel, companyinfoValidatio
 import response from "../utils/response.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
 
+// addContactUs
 export const addContactUs = async (req, res) => {
     try {
         const { name, email, message, inquiryType, moq } = req.body;
@@ -9,7 +10,7 @@ export const addContactUs = async (req, res) => {
         const { error } = contactValidation.validate(req.body);
         if (error) {
             return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
-        }
+        };
 
         const contact = new contactModel({
             userId: req.user._id,
@@ -28,6 +29,7 @@ export const addContactUs = async (req, res) => {
     }
 };
 
+// getAllCustomerQuerysList
 export const getAllCustomerQuerysList = async (req, res) => {
     try {
         const contacts = await contactModel.find().sort({ createdAt: -1 });
@@ -38,6 +40,7 @@ export const getAllCustomerQuerysList = async (req, res) => {
     }
 };
 
+// addCompanyinfo
 export const addCompanyinfo = async (req, res) => {
     const { error } = companyinfoValidation.validate(req.body);
     if (error) {
@@ -60,6 +63,7 @@ export const addCompanyinfo = async (req, res) => {
     }
 };
 
+// getCompanyinfo
 export const getCompanyinfo = async (req, res) => {
     try {
         const companyInfo = await companyinfoModel.findOne();

@@ -1,15 +1,6 @@
 import express from "express";
 const router = express.Router();
-import {
-  createProduct,
-  getAllProducts,
-  getProductById,
-  updateProduct,
-  deleteProduct,
-  searchProduct,
-  getPopularProducts,
-  //addDailyDeal
-} from "../controller/productController.js";
+import { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, searchProduct, getPopularProducts } from "../controller/productController.js";
 import { productImage } from "../utils/multer.js";
 import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 

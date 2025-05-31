@@ -1,11 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import {
-  addWishlist,
-  getWishlist,
-  removeFromWishlist,
-} from "../controller/wishlistController.js";
+import { addWishlist, getWishlist, removeFromWishlist, } from "../controller/wishlistController.js";
 import { authenticateUser } from "../middeleware/auth.js";
 
 router.post("/addWishlist", authenticateUser, addWishlist);

@@ -5,17 +5,8 @@ import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 
 const router = express.Router();
 
-router.post(
-    "/addReview",
-    authenticateUser,
-    reviewController.addReview
-); // user
+router.post("/addReview", authenticateUser, reviewController.addReview); // user
 
-router.delete(
-    "/admin/inActiveReview/:id",
-    authenticateUser,
-    authorizeUserRoles("admin"),
-    reviewController.inActiveReview
-); // admin
+router.delete("/admin/inActiveReview/:id", authenticateUser, authorizeUserRoles("admin"), reviewController.inActiveReview); // admin
 
 export default router;

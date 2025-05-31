@@ -1,10 +1,5 @@
 import express from "express";
-import {
-  addCategory,
-  getCategoryList,
-  updateCategory,
-  inActiveCategory
-} from "../controller/categoryController.js";
+import { addCategory, getCategoryList, updateCategory, inActiveCategory } from "../controller/categoryController.js";
 import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 
 const router = express.Router();
