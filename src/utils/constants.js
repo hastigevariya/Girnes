@@ -12,6 +12,7 @@ export const resMessage = {
   FETCH_SUCCESS: "Users fetched successfully",
   USER_ID_REQUIRED: "User ID is required",
   ACTION_COMPLETE: "Action completed successfully",
+  USER_SUBSCRIBE_SUCCESS: "USER_SUBSCRIBE_SUCCESS",
 
 
   PRODUCT_CREATED: "Product created successfully",

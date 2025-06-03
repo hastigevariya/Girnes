@@ -1,5 +1,8 @@
-import { userModel, userRegisterValidation, userLoginValidation, } from "../model/userModel.js";
+import { userModel, userRegisterValidation, userLoginValidation, shopNowEmailButtonModel } from "../model/userModel.js";
 import { generateToken } from "../middeleware/auth.js";
+// import {
+//   shopNowEmailButtonModel, // ✅ Add this
+// } from "../model/userModel.js";
 import response from "../utils/response.js";
 import { hash, compare } from "bcrypt";
 import { resStatusCode, resMessage } from "../utils/constants.js";
@@ -150,4 +153,57 @@ export async function updateUser(req, res) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   }
+};
+
+// addEmailShopNowButton
+export async function addEmailShopNowButton(req, res) {
+  const { url } = req.body;
+  const images = req.files.image;
+  try {
+    let newSubscriber;
+    const dataExist = await shopNowEmailButtonModel.findOne({ isActive: true, for: "welcomeEmail" });
+
+    const newImageFilenames = images.map(img => img.filename);
+
+    if (dataExist) {
+      // const existingImages = dataExist[0].image || [];
+      const existingImages = dataExist.image || [];
+      let combinedImages = [...existingImages, ...newImageFilenames];
+
+      combinedImages = combinedImages.slice(-2);
+
+      newSubscriber = await shopNowEmailButtonModel.findOneAndUpdate({ isActive: true, for: "welcomeEmail" }, {
+        url,
+        image: combinedImages
+      }, { new: true });
+    } else {
+      newSubscriber = await shopNowEmailButtonModel.create({
+        url,
+        image: newImageFilenames.slice(0, 2),
+        for: "welcomeEmail",   // <-- always set this
+        isActive: true
+      });
+    };
+
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.USER_SUBSCRIBE_SUCCESS, newSubscriber);
+  } catch (err) {
+    console.error(err);
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
+  };
+};
+
+// getEmailShopNowButton
+export async function getEmailShopNowButton(req, res) {
+  try {
+    const getEmailShopNowButton = await shopNowEmailButtonModel.findOne({ isActive: true });
+    const resData = {
+      image1: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[0],
+      image2: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[1],
+      url: getEmailShopNowButton.url
+    };
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.USER_SUBSCRIBE_SUCCESS, resData);
+  } catch (err) {
+    console.error(err);
+    return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
+  };
 };

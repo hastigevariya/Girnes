@@ -60,3 +60,19 @@ export const userLoginValidation = Joi.object({
     "any.required": "Password is required",
   }),
 });
+
+const emailShopNowButtonSchema = new Schema({
+  url: { type: String, required: true },
+  image: { type: [String], default: [] },
+  for: { type: String, default: "" },
+  isActive: { type: Boolean, default: true },
+}, { timestamps: true });
+
+export const shopNowEmailButtonModel = mongoose.model('email_sends', emailShopNowButtonSchema);
+
+export default {
+  userModel,
+  userRegisterValidation,
+  userLoginValidation,
+  shopNowEmailButtonModel,
+};
