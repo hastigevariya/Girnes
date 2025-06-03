@@ -7,6 +7,7 @@ import response from "../utils/response.js";
 import { hash, compare } from "bcrypt";
 import { resStatusCode, resMessage } from "../utils/constants.js";
 import sendMail from '../../mailer/index.js';
+
 // register
 export async function register(req, res) {
   console.log("REQ BODY:", req.body);
@@ -24,6 +25,16 @@ export async function register(req, res) {
     const createNewUser = await userModel.create({ fname, lname, email, password: hashedPassword, });
 
     const token = await generateToken({ _id: createNewUser._id });
+
+    const getEmailShopNowButton = await shopNowEmailButtonModel.findOne({ isActive: true });
+    const resData = {
+      image1: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[0],
+      image2: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[1],
+      url: getEmailShopNowButton.url
+    };
+    const ckemail = await sendMail("welcome-mail", "Welcome to Molimor Store", 'mihirkasodariya21@gmail.com', resData);
+    console.log('ckemail', ckemail);
+
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.USER_REGISTER, { _id: createNewUser._id, token: token });
   } catch (error) {
     console.error(error);
@@ -63,8 +74,6 @@ export async function profile(req, res) {
     if (!user) {
       return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.USER_NOT_FOUND, {});
     };
-    const ckemail = await sendMail("welcome-mail", "Welcome to Molimor Store", 'mihirkasodariya21@gmail.com', { name: "wdnk" });
-    console.log('ckemail', ckemail);
     const updatedUser = {
       ...user._doc,
       profilePhoto: user?.profilePhoto
@@ -180,7 +189,7 @@ export async function addEmailShopNowButton(req, res) {
       newSubscriber = await shopNowEmailButtonModel.create({
         url,
         image: newImageFilenames.slice(0, 2),
-        for: "welcomeEmail",   // <-- always set this
+        for: "welcomeEmail",
         isActive: true
       });
     };
