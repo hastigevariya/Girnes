@@ -32,7 +32,7 @@ export async function register(req, res) {
       image2: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[1],
       url: getEmailShopNowButton.url
     };
-    const ckemail = await sendMail("welcome-mail", "Welcome to Molimor Store", 'mihirkasodariya21@gmail.com', resData);
+    const ckemail = await sendMail("welcome-mail", "Welcome to Molimor Store", email, resData);
     console.log('ckemail', ckemail);
 
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.USER_REGISTER, { _id: createNewUser._id, token: token });
