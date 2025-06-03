@@ -30,7 +30,8 @@ export async function register(req, res) {
     const resData = {
       image1: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[0],
       image2: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[1],
-      url: getEmailShopNowButton.url
+      url: getEmailShopNowButton.url,
+      imagePath: process.env.IMAGE_PATH
     };
     const ckemail = await sendMail("welcome-mail", "Welcome to Molimor Store", email, resData);
     console.log('ckemail', ckemail);
