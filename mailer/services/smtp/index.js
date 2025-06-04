@@ -15,7 +15,6 @@ const transport = createTransport({
 });
 
 const sendMail = (to, from, subject, html, type = 'simple', attachmentBuffer = null, filename = null) => {
-    console.log(to);
     const mailOptions = {
         to,
         from,
@@ -32,7 +31,6 @@ const sendMail = (to, from, subject, html, type = 'simple', attachmentBuffer = n
             },
         ];
     }
-
     return transport.sendMail(mailOptions);
 };
 

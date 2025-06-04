@@ -18,7 +18,6 @@ import sendMail from '../../mailer/index.js';
 
 // register
 export async function register(req, res) {
-  console.log("REQ BODY:", req.body);
   const { fname, lname, email, password } = req.body;
   const { error } = userRegisterValidation.validate(req.body);
   if (error) {
@@ -35,22 +34,19 @@ export async function register(req, res) {
     const token = await generateToken({ _id: createNewUser._id });
 
     const getEmailShopNowButton = await shopNowEmailButtonModel.findOne({ isActive: true, for: 'welcomeEmail' });
-    console.log('getEmailShopNowButton', getEmailShopNowButton);
     const resData = {
       image1: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[0],
       image2: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[1],
       shopNow: getEmailShopNowButton?.url,
       imagePath: process.env.IMAGE_PATH
     };
-    console.log('resData', resData);
-    const ckemail = await sendMail("welcome-mail", "Welcome to Molimor Store", email, resData);
-    console.log('ckemail', ckemail);
 
+    const ckemail = await sendMail("welcome-mail", "Welcome to Girnes Store", email, resData);
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.USER_REGISTER, { _id: createNewUser._id, token: token });
   } catch (error) {
     console.error(error);
     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
-  }
+  };
 };
 
 // login
@@ -80,7 +76,6 @@ export async function login(req, res) {
 // profile
 export async function profile(req, res) {
   try {
-    console.log('dsfbhj');
     const user = await userModel.findById({ _id: req.user.id }).select("-password");
     if (!user) {
       return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.USER_NOT_FOUND, {});
@@ -241,14 +236,12 @@ export async function addSubscribeUser(req, res) {
     const isRegistered = !!existingUser;
 
     const userSubscribe = await subscribeUserModel.findOne({ email });
-    const getEmailShopNowButton = await shopNowEmailButtonModel?.findOne({ isActive: true, for: "subscribeEmail" });
-
-    sendMail("subscribeEmail", "Thanks for Joining Molimor - You're Officially In", email, {
+    const getEmailShopNowButton = await shopNowEmailButtonModel?.findOne({ isActive: true, for: "welcomeEmail" });
+    sendMail("subscribeEmail", "Thanks for Joining Girnes - You're Officially In", email, {
       productImage1: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton?.image[0],
       productImage2: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton?.image[1],
       shopNow: getEmailShopNowButton?.url,
       imagePath: process.env.IMAGE_PATH
-
     });
 
     if (!userSubscribe) {
