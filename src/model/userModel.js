@@ -70,9 +70,27 @@ const emailShopNowButtonSchema = new Schema({
 
 export const shopNowEmailButtonModel = mongoose.model('email_sends', emailShopNowButtonSchema);
 
+const subscribeUserSchema = new Schema({
+  email: { type: String, required: true },
+  isRegistered: { type: Boolean },
+  isActive: { type: Boolean, default: true },
+}, { timestamps: true });
+
+export const subscribeUserModel = model('subscribeusers', subscribeUserSchema);
+
+export const subscribeUserValidation = Joi.object({
+  email: Joi.string().email().required().messages({
+    'string.empty': 'Email is required.',
+    'string.email': 'Invalid email format.'
+  }),
+  isActive: Joi.boolean().optional(),
+});
+
 export default {
   userModel,
   userRegisterValidation,
   userLoginValidation,
   shopNowEmailButtonModel,
+  subscribeUserValidation,
+  subscribeUserModel
 };

@@ -1,7 +1,7 @@
 import { Router } from "express";
 const router = Router();
 // import { saveUserProfile } from '../utils/multerStorage.js';
-import { register, login, profile, getUserById, getAllUsers, updateUser, addEmailShopNowButton, getEmailShopNowButton } from "../controller/userController.js";
+import { register, login, profile, getUserById, getAllUsers, updateUser, addEmailShopNowButton, getEmailShopNowButton, addSubscribeUser, getAllSubscribedUsers } from "../controller/userController.js";
 import { authenticateUser, authorizeUserRoles } from "../middeleware/auth.js";
 import { saveUserProfile, uploadEmailImages } from "../utils/multer.js";
 
@@ -15,6 +15,10 @@ router.get("/admin/getAllUsers", authenticateUser, authorizeUserRoles('admin'), 
 router.put("/updateUser/:id", saveUserProfile.single("profilePhoto"), authenticateUser, updateUser);
 
 router.post('/admin/addEmailShopNowButton', uploadEmailImages, authenticateUser, authorizeUserRoles('admin'), addEmailShopNowButton); // admin add  url using email send 
-router.get('/getEmailShopNowButton', getEmailShopNowButton); // using email send 
+router.get('/getEmailShopNowButton', getEmailShopNowButton); // user
+
+router.post('/addSubscribeUser', addSubscribeUser); // user 
+router.get('/admin/getAllSubscribedUsers', getAllSubscribedUsers); // admin 
+
 
 export default router;
