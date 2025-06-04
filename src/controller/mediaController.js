@@ -41,8 +41,8 @@ export async function addMedia(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
-  }
-}
+  };
+};
 
 
 // adminGetAllMedia
@@ -54,7 +54,7 @@ export const adminGetAllMedia = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -67,7 +67,7 @@ export const getAllMedia = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -84,7 +84,7 @@ export const addVideoUrl = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -101,7 +101,7 @@ export const deleteMediaById = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -122,7 +122,7 @@ export const inActiveMediaById = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -146,7 +146,7 @@ export const addSocialAccountURL = async (req, res) => {
   } catch (err) {
     console.error("Error adding/updating social account:", err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -158,5 +158,5 @@ export const getSocialAccountURL = async (req, res) => {
   } catch (err) {
     console.error("Error fetching social links:", err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };

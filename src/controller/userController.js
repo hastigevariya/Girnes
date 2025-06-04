@@ -70,7 +70,7 @@ export async function login(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
-  }
+  };
 };
 
 // profile
@@ -90,7 +90,7 @@ export async function profile(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
-  }
+  };
 };
 
 // getAllUsers
@@ -101,7 +101,7 @@ export async function getAllUsers(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
-  }
+  };
 };
 
 // getUserById
@@ -112,19 +112,16 @@ export async function getUserById(req, res) {
     if (!id) {
       return response.error(res, req?.languageCode, resStatusCode.CLIENT_ERROR, resMessage.USER_ID_REQUIRED, {});
     }
-
     const user = await userModel.findById(id, "-password");
-
     if (!user) {
       return response.error(res, req?.languageCode, resStatusCode.NOT_FOUND, resMessage.NOT_FOUND, {});
-    }
-
+    };
     return response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.FETCH_SUCCESS, user);
   } catch (err) {
     console.error("Error in getUserById:", err);
     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
-  }
-}
+  };
+};
 
 // updateUser
 export async function updateUser(req, res) {
@@ -167,7 +164,7 @@ export async function updateUser(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
-  }
+  };
 };
 
 // addEmailShopNowButton
@@ -177,16 +174,12 @@ export async function addEmailShopNowButton(req, res) {
   try {
     let newSubscriber;
     const dataExist = await shopNowEmailButtonModel.findOne({ isActive: true, for: "welcomeEmail" });
-
     const newImageFilenames = images.map(img => img.filename);
-
     if (dataExist) {
       // const existingImages = dataExist[0].image || [];
       const existingImages = dataExist.image || [];
       let combinedImages = [...existingImages, ...newImageFilenames];
-
       combinedImages = combinedImages.slice(-2);
-
       newSubscriber = await shopNowEmailButtonModel.findOneAndUpdate({ isActive: true, for: "welcomeEmail" }, {
         url,
         image: combinedImages
@@ -223,10 +216,9 @@ export async function getEmailShopNowButton(req, res) {
   };
 };
 
-
+// addSubscribeUser
 export async function addSubscribeUser(req, res) {
   const { email } = req.body;
-
   const { error } = subscribeUserValidation.validate({ email });
   if (error) {
     return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
@@ -234,7 +226,6 @@ export async function addSubscribeUser(req, res) {
   try {
     const existingUser = await userModel.findOne({ email });
     const isRegistered = !!existingUser;
-
     const userSubscribe = await subscribeUserModel.findOne({ email });
     const getEmailShopNowButton = await shopNowEmailButtonModel?.findOne({ isActive: true, for: "welcomeEmail" });
     sendMail("subscribeEmail", "Thanks for Joining Girnes - You're Officially In", email, {
@@ -243,7 +234,6 @@ export async function addSubscribeUser(req, res) {
       shopNow: getEmailShopNowButton?.url,
       imagePath: process.env.IMAGE_PATH
     });
-
     if (!userSubscribe) {
       const newSubscriber = new subscribeUserModel({
         email,
@@ -260,6 +250,7 @@ export async function addSubscribeUser(req, res) {
   };
 };
 
+// getAllSubscribedUsers
 export async function getAllSubscribedUsers(req, res) {
   try {
     const filter = {};

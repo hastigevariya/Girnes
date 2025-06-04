@@ -39,8 +39,8 @@ export async function placeOrder(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
-}
+  };
+};
 
 
 // getAllUserOrders
@@ -70,7 +70,7 @@ export async function getAllUserOrders(req, res) {
   } catch (err) {
     console.error("getAllUserOrders error =>", err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -105,7 +105,7 @@ export async function getOrderById(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // updateOrder
@@ -125,7 +125,7 @@ export async function updateOrder(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // cancelOrder
@@ -154,5 +154,5 @@ export async function cancelOrder(req, res) {
   } catch (error) {
     console.error("Cancel Order Error:", error);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };

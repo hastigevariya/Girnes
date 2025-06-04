@@ -26,7 +26,7 @@ export async function addCategory(req, res) {
   } catch (error) {
     console.error(error);
     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // getCategoryList
@@ -53,7 +53,7 @@ export async function getCategoryList(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // updateCategory
@@ -78,8 +78,10 @@ export async function updateCategory(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
+
+// inActiveCategory
 export async function inActiveCategory(req, res) {
   const { categoryId } = req.params;
   const { isActive } = req.body;
@@ -104,15 +106,9 @@ export async function inActiveCategory(req, res) {
 
     const statusMessage = isActive ? "activated" : "inactivated";
 
-    return response.success(
-      res,
-      req.languageCode,
-      resStatusCode.ACTION_COMPLETE,
-      `Category ${statusMessage} successfully`,
-      updatedCategory
-    );
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, `Category ${statusMessage} successfully`, updatedCategory);
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
-}
+  };
+};

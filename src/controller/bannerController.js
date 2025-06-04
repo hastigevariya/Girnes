@@ -79,7 +79,7 @@ export async function deleteBannerById(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // inActiveBannerById
@@ -98,5 +98,5 @@ export async function inActiveBannerById(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };

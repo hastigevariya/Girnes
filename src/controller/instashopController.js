@@ -18,7 +18,7 @@ export const addInstaShop = async (req, res) => {
     } catch (error) {
         console.error("Error in addInstaShop:", error);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };
 
 // getAllInstaShops
@@ -30,7 +30,7 @@ export const getAllInstaShops = async (req, res) => {
     } catch (error) {
         console.error("Error in getAllInstaShops:", error);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };
 
 // updateInstaShopStatus
@@ -57,6 +57,6 @@ export const updateInstaShopStatus = async (req, res) => {
     } catch (error) {
         console.error("Error in updateInstaShopStatus:", error);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };
 

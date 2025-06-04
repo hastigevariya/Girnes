@@ -25,7 +25,7 @@ export const addAbout = async (req, res) => {
     } catch (error) {
         console.error("Error in addAbout:", error);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };
 
 // getAbout
@@ -36,5 +36,5 @@ export async function getAbout(req, res) {
     } catch (error) {
         console.error(error);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };

@@ -31,7 +31,7 @@ export const addReview = async (req, res) => {
     } catch (err) {
         console.error("Error in addReview:", err);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };
 
 // Inactivate Review
@@ -51,5 +51,5 @@ export const inActiveReview = async (req, res) => {
     } catch (err) {
         console.error("Error in inActiveReview:", err);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };

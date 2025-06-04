@@ -73,8 +73,8 @@ export async function updateCart(req, res) {
   } catch (error) {
     console.error("updateCart error:", error);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
-}
+  };
+};
 
 
 // deleteCartByProductId
@@ -90,5 +90,5 @@ export async function deleteCartByProductId(req, res) {
   } catch (error) {
     console.error(error);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
-}
+  };
+};

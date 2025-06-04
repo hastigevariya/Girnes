@@ -23,7 +23,7 @@ export async function addSubCategory(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // Get SubCategory List
@@ -35,7 +35,7 @@ export async function getSubCategoryList(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // Update SubCategory
@@ -62,9 +62,10 @@ export async function updateSubCategory(req, res) {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
+// inActiveSubCategory
 export const inActiveSubCategory = async (req, res) => {
   const { subCategoryId } = req.params;
 
@@ -79,5 +80,5 @@ export const inActiveSubCategory = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };

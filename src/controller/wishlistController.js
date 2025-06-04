@@ -30,7 +30,7 @@ export const addWishlist = async (req, res) => {
   } catch (err) {
     console.error("addWishlist error:", err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // getWishlist
@@ -48,7 +48,7 @@ export const getWishlist = async (req, res) => {
   } catch (err) {
     console.error("getWishlist error:", err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // removeFromWishlist
@@ -66,14 +66,12 @@ export const removeFromWishlist = async (req, res) => {
 
     if (!item) {
       return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.PRODUCT_NOT_IN_WISHLIST);
-    }
-
+    };
     item.isDelete = true;
     await item.save();
-
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.WISHLIST_ITEM_REMOVED, item);
   } catch (err) {
     console.error("removeFromWishlist error:", err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };

@@ -26,7 +26,7 @@ export const addContactUs = async (req, res) => {
     } catch (err) {
         console.error("Error in addContactUs:", err);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };
 
 // getAllCustomerQuerysList
@@ -37,7 +37,7 @@ export const getAllCustomerQuerysList = async (req, res) => {
     } catch (err) {
         console.error("Error in getAllCustomerQuerysList:", err);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };
 
 // addCompanyinfo
@@ -60,7 +60,7 @@ export const addCompanyinfo = async (req, res) => {
     } catch (err) {
         console.error("Error in addCompanyinfo:", err);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };
 
 // getCompanyinfo
@@ -76,5 +76,5 @@ export const getCompanyinfo = async (req, res) => {
     } catch (err) {
         console.error("Error in getCompanyinfo:", err);
         return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-    }
+    };
 };

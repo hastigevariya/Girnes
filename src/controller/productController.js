@@ -86,7 +86,7 @@ export const createProduct = async (req, res) => {
   } catch (err) {
     console.error("Error while creating product:", err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 //getall
@@ -168,7 +168,7 @@ export const getAllProducts = async (req, res) => {
   } catch (err) {
     console.error("getAllProducts error:", err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 // Get One
@@ -186,7 +186,7 @@ export const getProductById = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -272,7 +272,7 @@ export const updateProduct = async (req, res) => {
   } catch (error) {
     console.error(error);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -288,7 +288,7 @@ export const deleteProduct = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -312,7 +312,7 @@ export const searchProduct = async (req, res) => {
   } catch (err) {
     console.error(err);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
 
 
@@ -350,5 +350,5 @@ export const getPopularProducts = async (req, res) => {
   } catch (error) {
     console.error("Error fetching popular products:", error.message);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
-  }
+  };
 };
