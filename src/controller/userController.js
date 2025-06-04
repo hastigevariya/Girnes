@@ -26,13 +26,15 @@ export async function register(req, res) {
 
     const token = await generateToken({ _id: createNewUser._id });
 
-    const getEmailShopNowButton = await shopNowEmailButtonModel.findOne({ isActive: true });
+    const getEmailShopNowButton = await shopNowEmailButtonModel.findOne({ isActive: true, for: 'welcomeEmail' });
+    console.log('getEmailShopNowButton', getEmailShopNowButton);
     const resData = {
       image1: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[0],
       image2: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[1],
-      url: getEmailShopNowButton.url,
+      shopNow: getEmailShopNowButton?.url,
       imagePath: process.env.IMAGE_PATH
     };
+    console.log('resData', resData);
     const ckemail = await sendMail("welcome-mail", "Welcome to Molimor Store", email, resData);
     console.log('ckemail', ckemail);
 
