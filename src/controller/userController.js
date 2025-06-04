@@ -247,6 +247,8 @@ export async function addSubscribeUser(req, res) {
       productImage1: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton?.image[0],
       productImage2: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton?.image[1],
       shopNow: getEmailShopNowButton?.url,
+      imagePath: process.env.IMAGE_PATH
+
     });
 
     if (!userSubscribe) {
