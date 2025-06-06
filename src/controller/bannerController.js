@@ -26,7 +26,7 @@ export async function getAllBanner(req, res) {
     const bannerList = await bannerModel.find({ isActive: true, isDelete: false }).sort({ createdAt: -1 });
 
     if (!bannerList?.length) {
-      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.BANNER_LIST_EMPTY, []);
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.BANNER_LIST_EMPTY, []);
     };
 
     const updatedBannerList = bannerList.map((banner) => ({
@@ -49,7 +49,7 @@ export async function adminGetAllBanner(req, res) {
     const bannerList = await bannerModel.find({ isDelete: false }).sort({ createdAt: -1 });
 
     if (!bannerList?.length) {
-      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.BANNER_LIST_EMPTY, []);
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.BANNER_LIST_EMPTY, []);
     };
 
     const updatedBannerList = bannerList.map((banner) => ({

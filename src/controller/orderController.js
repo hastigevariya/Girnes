@@ -1,18 +1,11 @@
 import { orderModel, orderValidation, getOrderValidation, } from "../model/orderModel.js";
 import response from "../utils/response.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
-
-// import model from '../model/orderModel.js';
-// import constants from '../utils/constants.js';
-// import { sendNotification } from '../utils/sendNotification.js';
-import { userModel } from '../model/userModel.js';
 import { productModel } from '../model/productModel.js';
 import { Types } from 'mongoose';
 import { cartModel } from '../model/cartModel.js';
 import sendMail from '../../mailer/index.js';
 import generateInvoicePDF from '../utils/generateInvoicePDF.js'
-// import { fileURLToPath } from 'url';
-// import { dirname } from 'path';
 
 // placeOrder
 export async function placeOrder(req, res) {
@@ -49,57 +42,22 @@ export async function placeOrder(req, res) {
       totalAmount,
       orderNote,
     });
-    const fullName = `${fname} ${lname}`;
-    const orderSummary = cartItems.slice(0, 2).map(i => `${i.quantity}x Item`).join(', ') + (cartItems.length > 2 ? '...' : '');
-
-    // const adminFcmToken = await userModel.findOne({ role: 'admin' });
-
+    // const fullName = `${fname} ${lname}`;
+    // const orderSummary = cartItems.slice(0, 2).map(i => `${i.quantity}x Item`).join(', ') + (cartItems.length > 2 ? '...' : '');
     const productIds = cartItems.map(item => new Types.ObjectId(item.productId));
-
     const orderedProducts = await productModel.find({
       _id: { $in: productIds }
     });
-    console.log('orderedProducts', orderedProducts);
-    const productSkus = orderedProducts.map(product => product.sku).join(', ');
-
-    // await sendNotification(
-    //   adminFcmToken.fcm,
-    //   {
-    //     title: '🛒 New Order Placed!',
-    //     body: `Order #${orderId} by ${fullName} for ₹${totalAmount}`
-    //   },
-    //   {
-    //     orderId,
-    //     customerName: fullName,
-    //     totalAmount: totalAmount.toString(),
-    //     paymentMethod,
-    //     mobile,
-    //     email,
-    //     shippingCharge,
-    //     SKU: productSkus,
-    //     totalItem: cartItems.length.toString(),
-    //     address: {
-    //       streetAddress: streetAddress.join(', '),
-    //       shippingAddress: shippingAddress,
-    //       state,
-    //       country,
-    //       pincode
-    //     },
-    //     orderNote,
-    //     orderSummary
-    //   }
-    // );
+    // const productSkus = orderedProducts.map(product => product.sku).join(', ');
     await cartModel.updateOne(
       { userId: req.user.id },
       { $pull: { items: { productId: { $in: productIds } } } }
     );
-
     let subtotalArry = [];
     let gstChargeArry = [];
     cartItems.forEach(p => {
       p.taxableValue = p.qty * p.unitPrice;
       p.amount = p.taxableValue;
-
     });
     cartItems.forEach(cartItem => {
       const matchedProduct = orderedProducts.find(prod => prod._id.toString() === cartItem.productId.toString());
@@ -144,7 +102,7 @@ export async function placeOrder(req, res) {
       name: req?.user.fname,
       products: cartItems,
     });
-    console.log('pdfBuffer', pdfBuffer);
+
     sendMail(
       "billingInvoice",
       "Molimor Purchase Invoice",
@@ -165,12 +123,12 @@ export async function placeOrder(req, res) {
         name: req?.user.fname,
         products: cartItems
       },
+
       process.env.FROM_MAIL,
       "attachment",
       pdfBuffer,
       `invoice-${orderId}.pdf`
     );
-
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ORDER_PLACED, newOrder);
   } catch (err) {
     console.error(err);
@@ -178,30 +136,26 @@ export async function placeOrder(req, res) {
   };
 };
 
-
 // getAllUserOrders
 export async function getAllUserOrders(req, res) {
   try {
     const userId = req.user.id;
-    console.log("userId =>", userId);
     let orders = await orderModel.find({ userId }).populate("items.productId").sort({ createdAt: -1 });
 
     if (!orders || orders.length === 0) {
-      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.NO_ORDERS_FOUND);
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.NO_ORDERS_FOUND);
     };
-
     const updatedOrders = orders.map((order) => {
       const updatedItems = order.items.map((item) => {
         if (item.productId && Array.isArray(item.productId.image)) {
           item.productId.image = item.productId.image.map((img) =>
             img.startsWith("/productImages/") ? img : `/productImages/${img}`
           );
-        }
+        };
         return item;
       });
       return { ...order._doc, items: updatedItems };
     });
-
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ORDER_LIST_FETCHED, updatedOrders);
   } catch (err) {
     console.error("getAllUserOrders error =>", err);
@@ -209,34 +163,27 @@ export async function getAllUserOrders(req, res) {
   };
 };
 
-
 // getOrderById
 export async function getOrderById(req, res) {
   const { error } = getOrderValidation.validate(req.params);
   if (error) {
     return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
   };
-
   const { id: orderId } = req.params;
-
   try {
     const order = await orderModel.findById(req.params.id).populate("items.productId");
-
     if (!order) {
-      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.ORDER_NOT_FOUND);
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.ORDER_NOT_FOUND);
     };
-
     const updatedItems = order.items.map((item) => {
       if (item.productId && Array.isArray(item.productId.image)) {
         item.productId.image = item.productId.image.map((img) =>
           img.startsWith("/productImages/") ? img : `/productImages/${img}`
         );
-      }
+      };
       return item;
     });
-
     const updatedOrder = { ...order._doc, items: updatedItems };
-
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ORDER_FETCHED, updatedOrder);
   } catch (err) {
     console.error(err);
@@ -247,16 +194,16 @@ export async function getOrderById(req, res) {
 // updateOrder
 export async function updateOrder(req, res) {
   const { id: orderId } = req.params;
-
   const updatePayload = req.body;
-
   try {
-    const updatedOrder = await orderModel.findByIdAndUpdate(orderId, updatePayload, { new: true });
-
-    if (!updatedOrder) {
-      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.ORDER_NOT_FOUND);
+    const { error } = getOrderValidation.validate(updatePayload);
+    if (error) {
+      return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
     }
-
+    const updatedOrder = await orderModel.findByIdAndUpdate(orderId, updatePayload, { new: false });
+    if (!updatedOrder) {
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.ORDER_NOT_FOUND);
+    };
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ORDER_UPDATED, updatedOrder);
   } catch (err) {
     console.error(err);
@@ -267,25 +214,23 @@ export async function updateOrder(req, res) {
 // cancelOrder
 export async function cancelOrder(req, res) {
   const { id } = req.params;
-
   try {
-    const order = await orderModel.findById(id);
-
-    if (!order) {
-      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.ORDER_NOT_FOUND);
+    const { error } = getOrderValidation.validate({ id });
+    if (error) {
+      return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
     };
-
+    const order = await orderModel.findById(id);
+    if (!order) {
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.ORDER_NOT_FOUND);
+    };
     if (order.status === "Delivered") {
       return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, resMessage.ORDER_ALREADY_DELIVERED);
     };
-
     if (order.status === "Cancelled") {
       return response.error(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ORDER_CANCELLED,);
     };
-
     order.status = "Cancelled";
     await order.save();
-
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ORDER_CANCELLED, order);
   } catch (error) {
     console.error("Cancel Order Error:", error);

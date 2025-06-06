@@ -9,12 +9,16 @@ export const resMessage = {
   INVALID_PASSWORD: "INVALID_PASSWORD",
   ALREADY_EXISTS: "ALREADY_EXISTS",
   UPDATE_SUCCESS: "User updated successfully",
+  UPDATE_INSTA_SHOP: "Insta shop updated successfully",
   FETCH_SUCCESS: "Users fetched successfully",
   USER_ID_REQUIRED: "User ID is required",
   ACTION_COMPLETE: "Action completed successfully",
   USER_SUBSCRIBE_SUCCESS: "Thank you for subscribing — welcome to the community!",
+  UNAUTHORIZED: "Unauthorized request",
 
 
+  SEARCH_TERM_REQUIRED: "Search term is required.",
+  INVALID_PRODUCT_ID_FORMAT: "Invalid product ID format",
   PRODUCT_CREATED: "Product created successfully",
   PRODUCT_LIST_FETCHED: "Product list fetched successfully",
   PRODUCT_FETCHED: "Product fetched successfully",
@@ -38,6 +42,7 @@ export const resMessage = {
   // ALREADY_EXISTS: "Subcategory already exists",
   // INTERNAL_SERVER_ERROR: "Something went wrong",
 
+  CATEGORY_UPDATED: "Category updated successfully",
   CATEGORY_CREATED: "Category created successfully.",
   CATEGORY_LIST_FETCHED: "Category list fetched successfully.",
   ORDER_PLACED: "Order placed successfully.",
@@ -66,6 +71,8 @@ export const resMessage = {
   // INTERNAL_SERVER_ERROR:
   //   "Oops! Something went wrong. Our team is looking into it.",
 
+  SUBCATEGORY_ACTIVATED: "Subcategory activated successfully",
+  INVALID_SUBCATEGORY_ID: "Invalid subcategory ID format",
   CATEGORY_CREATED: "Category created successfully.",
   CATEGORY_LIST_FETCHED: "Category list fetched successfully.",
   SUBCATEGORY_CREATED: "Sub-category created successfully.",
@@ -146,7 +153,9 @@ export const resMessage = {
   INSTA_SHOP_CREATED: "Insta shop created successfully",
   INSTA_SHOP_FETCHED: "Insta shops fetched successfully",
   REQUIRED_FIELDS: "Image and URL are required",
-  INTERNAL_SERVER_ERROR: "Something went wrong"
+  INTERNAL_SERVER_ERROR: "Something went wrong",
+  SKU_ALREADY_EXISTS: "SKU already exists. Please use a unique SKU."
+
 };
 
 export const resStatusCode = {

@@ -1,16 +1,5 @@
-// import { userModel, userRegisterValidation, userLoginValidation, shopNowEmailButtonModel, subscribeUserValidation, subscribeUserModel } from "../model/userModel.js";
-import {
-  userModel,
-  userRegisterValidation,
-  userLoginValidation,
-  shopNowEmailButtonModel,
-  subscribeUserModel,
-  subscribeUserValidation,
-} from "../model/userModel.js";
+import { userModel, userRegisterValidation, userLoginValidation, shopNowEmailButtonModel, subscribeUserModel, subscribeUserValidation, addEmailShopNowButtonValidation } from "../model/userModel.js";
 import { generateToken } from "../middeleware/auth.js";
-// import {
-//   shopNowEmailButtonModel, // ✅ Add this
-// } from "../model/userModel.js";
 import response from "../utils/response.js";
 import { hash, compare } from "bcrypt";
 import { resStatusCode, resMessage } from "../utils/constants.js";
@@ -30,9 +19,7 @@ export async function register(req, res) {
     };
     const hashedPassword = await hash(password, 10);
     const createNewUser = await userModel.create({ fname, lname, email, password: hashedPassword, });
-
     const token = await generateToken({ _id: createNewUser._id });
-
     const getEmailShopNowButton = await shopNowEmailButtonModel.findOne({ isActive: true, for: 'welcomeEmail' });
     const resData = {
       image1: process.env.IMAGE_PATH + "/aboutusImage/" + getEmailShopNowButton.image[0],
@@ -40,7 +27,6 @@ export async function register(req, res) {
       shopNow: getEmailShopNowButton?.url,
       imagePath: process.env.IMAGE_PATH
     };
-
     const ckemail = await sendMail("welcome-mail", "Welcome to Girnes Store", email, resData);
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.USER_REGISTER, { _id: createNewUser._id, token: token });
   } catch (error) {
@@ -76,6 +62,10 @@ export async function login(req, res) {
 // profile
 export async function profile(req, res) {
   try {
+    const userId = req?.user?.id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, resMessage.INVALID_USER_ID || resMessage.INVALID_PASSWORD);
+    };
     const user = await userModel.findById({ _id: req.user.id }).select("-password");
     if (!user) {
       return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.USER_NOT_FOUND, {});
@@ -96,6 +86,9 @@ export async function profile(req, res) {
 // getAllUsers
 export async function getAllUsers(req, res) {
   try {
+    if (!req?.user || !req.user.id) {
+      return response.error(res, req?.languageCode, resStatusCode.UNAUTHORISED, resMessage.UNAUTHORIZED);
+    };
     const users = await userModel.find({}, "-password");
     return response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.FETCH_SUCCESS, users);
   } catch (err) {
@@ -114,7 +107,7 @@ export async function getUserById(req, res) {
     }
     const user = await userModel.findById(id, "-password");
     if (!user) {
-      return response.error(res, req?.languageCode, resStatusCode.NOT_FOUND, resMessage.NOT_FOUND, {});
+      return response.error(res, req?.languageCode, resStatusCode.FORBIDDEN, resMessage.NOT_FOUND, {});
     };
     return response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.FETCH_SUCCESS, user);
   } catch (err) {
@@ -137,11 +130,14 @@ export async function updateUser(req, res) {
     pinCode,
   } = req.body;
   try {
+    const { error } = addEmailShopNowButtonValidation.validate({ url, image: normalizedImages });
+    if (error) {
+      return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+    };
     const user = await userModel.findById({ _id: req.user._id });
     if (!user) {
-      return response.error(res, req.languageCode, resStatusCode.NOT_FOUND, resMessage.USER_NOT_FOUND, {});
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.USER_NOT_FOUND, {});
     };
-
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user.id,
       {
@@ -159,7 +155,6 @@ export async function updateUser(req, res) {
       },
       { new: true, runValidators: true }
     );
-
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.UPDATE_SUCCESS, updatedUser);
   } catch (err) {
     console.error(err);
@@ -192,7 +187,6 @@ export async function addEmailShopNowButton(req, res) {
         isActive: true
       });
     };
-
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.USER_SUBSCRIBE_SUCCESS, newSubscriber);
   } catch (err) {
     console.error(err);

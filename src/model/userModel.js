@@ -86,11 +86,24 @@ export const subscribeUserValidation = Joi.object({
   isActive: Joi.boolean().optional(),
 });
 
+export const addEmailShopNowButtonValidation = Joi.object({
+  url: Joi.string()
+    .uri()
+    .required()
+    .messages({
+      "string.empty": "URL is required",
+      "string.uri": "URL must be a valid URI",
+      "any.required": "URL is required",
+    }),
+
+});
+
 export default {
   userModel,
   userRegisterValidation,
   userLoginValidation,
   shopNowEmailButtonModel,
   subscribeUserValidation,
-  subscribeUserModel
+  subscribeUserModel,
+  addEmailShopNowButtonValidation
 };

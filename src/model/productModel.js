@@ -185,6 +185,11 @@ export const dailyDealValidation = Joi.object({
 });
 
 export const updateProductValidation = Joi.object({
+  id: Joi.string().required().messages({
+    "string.base": "Product ID must be a string",
+    "string.empty": "Product ID is required",
+    "any.required": "Product ID is required",
+  }),
   title: Joi.string().min(3).max(200).optional(),
   price: Joi.number().positive().optional(),
   mrp: Joi.number().positive().optional(),

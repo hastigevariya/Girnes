@@ -17,7 +17,6 @@ export const addReview = async (req, res) => {
         if (existsReview) {
             return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.REVIEW_ALREADY_SUBMITTED);
         };
-
         const addReview = await reviewModel.create({
             rating,
             userId,
@@ -26,7 +25,6 @@ export const addReview = async (req, res) => {
             email,
             comment
         });
-
         return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.REVIEW_SUBMITTED, addReview);
     } catch (err) {
         console.error("Error in addReview:", err);
@@ -38,15 +36,12 @@ export const addReview = async (req, res) => {
 export const inActiveReview = async (req, res) => {
     const { productId, isActive } = req.body;
     const userId = req.params.id;
-
     const { error } = inActiveValidation.validate(req.body);
     if (error) {
         return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
     };
-
     try {
         const updatedReview = await reviewModel.findOneAndUpdate({ productId, userId }, { isActive }, { new: true });
-
         return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.REVIEW_UPDATED, updatedReview);
     } catch (err) {
         console.error("Error in inActiveReview:", err);
