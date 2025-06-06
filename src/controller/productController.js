@@ -10,7 +10,7 @@ import { updateProductValidation } from "../model/productModel.js";
 // Create Product
 export const createProduct = async (req, res) => {
   try {
-    let { title, price, mrp, bulletPoint, quantity, stock, subcategoryId, tag, description, sku, dailySalePrice, isSale, isActive, startSale, endSale } = req.body;
+    let { title, price, mrp, gst, hsnCode, bulletPoint, quantity, stock, subcategoryId, tag, description, sku, dailySalePrice, isSale, isActive, startSale, endSale } = req.body;
 
     if (typeof bulletPoint === "string") {
       bulletPoint = JSON.parse(bulletPoint);
@@ -28,6 +28,8 @@ export const createProduct = async (req, res) => {
       tag,
       description,
       sku,
+      gst: gst + '%',
+      hsnCode: hsnCode,
       isActive,
       startSale,
       endSale
@@ -238,7 +240,7 @@ export const updateProduct = async (req, res) => {
     if (uploadedFiles.length > 0) { updatedImages = uploadedFiles; }
 
     // Apply to update
-    const updatedData = { ...req.body, image: updatedImages, };
+    const updatedData = { ...req.body, image: updatedImages, gst: req.body.gst, hsnCode: req.body.hsnCode, };
 
     const updatedProduct = await productModel.findByIdAndUpdate(id, updatedData, { new: true });
     if (isSale || dailySalePrice) {

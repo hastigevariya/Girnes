@@ -17,6 +17,8 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     image: { type: [String], required: false },
+    gst: { type: String, required: false },
+    hsnCode: { type: Number, required: false },
     sku: { type: String, required: false },
     isActive: { type: Boolean, default: true },
     isDelete: { type: Boolean, default: false },
@@ -143,7 +145,8 @@ export const productValidation = Joi.object({
   image: Joi.array().items(
     Joi.string().pattern(/\.(jpg|jpeg|png|gif|webp)$/i)
   ).optional(),
-
+  gst: Joi.string().optional().label('GST'),
+  hsnCode: Joi.number().optional().label('HSN Code'),
 
   sku: Joi.string().optional(),
 

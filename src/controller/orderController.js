@@ -2,6 +2,18 @@ import { orderModel, orderValidation, getOrderValidation, } from "../model/order
 import response from "../utils/response.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
 
+// import model from '../model/orderModel.js';
+// import constants from '../utils/constants.js';
+// import { sendNotification } from '../utils/sendNotification.js';
+import { userModel } from '../model/userModel.js';
+import { productModel } from '../model/productModel.js';
+import { Types } from 'mongoose';
+import { cartModel } from '../model/cartModel.js';
+import sendMail from '../../mailer/index.js';
+import generateInvoicePDF from '../utils/generateInvoicePDF.js'
+// import { fileURLToPath } from 'url';
+// import { dirname } from 'path';
+
 // placeOrder
 export async function placeOrder(req, res) {
   const { fname, lname, cartItems, paymentMethod, streetAddress, country, state, pincode, shippingAddress, shippingCharge, mobile, email, orderNote, } = req.body;
@@ -16,6 +28,9 @@ export async function placeOrder(req, res) {
     let lastOrder = await orderModel.findOne({}).sort({ orderId: -1 }).select("orderId");
     let orderId = lastOrder ? (parseInt(lastOrder.orderId) + 2).toString() : Math.floor(100000 + Math.random() * 900000).toString();
 
+    if (!lastOrder) {
+      orderId = Math.floor(100000 + Math.random() * 900000);
+    };
     const newOrder = await orderModel.create({
       orderId,
       userId: req.user.id,
@@ -34,6 +49,127 @@ export async function placeOrder(req, res) {
       totalAmount,
       orderNote,
     });
+    const fullName = `${fname} ${lname}`;
+    const orderSummary = cartItems.slice(0, 2).map(i => `${i.quantity}x Item`).join(', ') + (cartItems.length > 2 ? '...' : '');
+
+    // const adminFcmToken = await userModel.findOne({ role: 'admin' });
+
+    const productIds = cartItems.map(item => new Types.ObjectId(item.productId));
+
+    const orderedProducts = await productModel.find({
+      _id: { $in: productIds }
+    });
+    console.log('orderedProducts', orderedProducts);
+    const productSkus = orderedProducts.map(product => product.sku).join(', ');
+
+    // await sendNotification(
+    //   adminFcmToken.fcm,
+    //   {
+    //     title: '🛒 New Order Placed!',
+    //     body: `Order #${orderId} by ${fullName} for ₹${totalAmount}`
+    //   },
+    //   {
+    //     orderId,
+    //     customerName: fullName,
+    //     totalAmount: totalAmount.toString(),
+    //     paymentMethod,
+    //     mobile,
+    //     email,
+    //     shippingCharge,
+    //     SKU: productSkus,
+    //     totalItem: cartItems.length.toString(),
+    //     address: {
+    //       streetAddress: streetAddress.join(', '),
+    //       shippingAddress: shippingAddress,
+    //       state,
+    //       country,
+    //       pincode
+    //     },
+    //     orderNote,
+    //     orderSummary
+    //   }
+    // );
+    await cartModel.updateOne(
+      { userId: req.user.id },
+      { $pull: { items: { productId: { $in: productIds } } } }
+    );
+
+    let subtotalArry = [];
+    let gstChargeArry = [];
+    cartItems.forEach(p => {
+      p.taxableValue = p.qty * p.unitPrice;
+      p.amount = p.taxableValue;
+
+    });
+    cartItems.forEach(cartItem => {
+      const matchedProduct = orderedProducts.find(prod => prod._id.toString() === cartItem.productId.toString());
+      if (matchedProduct) {
+        cartItem.name = matchedProduct.title;
+        cartItem.hsn = matchedProduct.hsnCode;
+        const gstRate = parseInt(matchedProduct.gst.replace('%', ''));
+        cartItem.gst = gstRate;
+
+        const quantity = parseInt(cartItem.quantity);
+        cartItem.quantity = quantity;
+
+        const price = parseInt(cartItem.price);
+        cartItem.price = price;
+
+        const taxableValue = price * quantity + (price * gstRate * quantity) / 100;
+        subtotalArry.push(taxableValue)
+
+        cartItem.taxableValue = taxableValue;
+        const gstCharge = price * quantity * gstRate / 100
+        gstChargeArry.push(gstCharge)
+      };
+    });
+
+    const csgst = gstChargeArry.reduce((sum, val) => sum + val, 0);
+    const subTotal = subtotalArry.reduce((sum, val) => sum + val, 0);
+
+    const pdfBuffer = await generateInvoicePDF({
+      custName: req.body?.fname + " " + req.body?.lname,
+      addressLine: streetAddress,
+      imagePath: process.env.IMAGE_PATH,
+      state,
+      country,
+      zip: pincode,
+      phone: mobile,
+      email: email,
+      invoiceCount: 1,
+      orderId,
+      invoiceDate: new Date().toISOString().split("T")[0],
+      csgst,
+      subTotal,
+      name: req?.user.fname,
+      products: cartItems,
+    });
+    console.log('pdfBuffer', pdfBuffer);
+    sendMail(
+      "billingInvoice",
+      "Molimor Purchase Invoice",
+      req?.user?.email,
+      {
+        custName: req.body?.fname + req.body?.lname,
+        addressLine: streetAddress,
+        state,
+        country,
+        zip: pincode,
+        phone: mobile,
+        email,
+        invoiceCount: 1,
+        orderId,
+        invoiceDate: new Date().toISOString().split('T')[0],
+        csgst,
+        subTotal,
+        name: req?.user.fname,
+        products: cartItems
+      },
+      process.env.FROM_MAIL,
+      "attachment",
+      pdfBuffer,
+      `invoice-${orderId}.pdf`
+    );
 
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ORDER_PLACED, newOrder);
   } catch (err) {

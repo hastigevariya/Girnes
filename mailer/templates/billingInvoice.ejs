@@ -1,0 +1,126 @@
+<link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+<section class="py-5">
+  <div class="container" style="max-width: 1200px;">
+    <div>
+      <div class="card-body p-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="mb-0 text-uppercase">Invoice</h2>
+            <p class="mb-0">Invoice #: INT-<%= data.invoiceCount %>
+            </p>
+            <p class="mb-0">Order ID: #<%= data.orderId %>
+            </p>
+            <p class="mb-0">Date: <%= data.invoiceDate %>
+            </p>
+          </div>
+          <div>
+            <img src="<%= data.imagePath %>/assets/GirnesLogo.png" alt="Girnes Logo" width="140" />
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <h5 class="mb-2">From:</h5>
+            <address>
+              <strong>GIRNES PRIVATE LIMITED</strong><br />
+              180, BHATHENA -2, ANJANA,<br />
+              SURAT, GUJARAT, 395002, INDIA<br />
+              Phone: +91 9081111499<br />
+              Email: info@girnes.com
+            </address>
+          </div>
+          <div class="col-md-6">
+            <h5 class="mb-2">Bill To:</h5>
+            <address>
+              <strong>
+                <%= data.custName %>
+              </strong><br />
+              <%= data.addressLine %><br />
+                <%= data.city %>
+                  <%= data.state %> - <%= data.zip %><br />
+                      <%= data.country %><br />
+                        Phone: <%= data.phone %><br />
+                          Email: <%= data.email %>
+            </address>
+          </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th>HSN</th>
+                <th class="text-end">Price</th>
+                <th class="text-center">Qty</th>
+                <!-- <th class="text-end">Taxable</th> -->
+                <th class="text-center " style="padding-right: 4px; padding-left: 4px;">GST %</th>
+                <th class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% let totalAmount=0; %>
+                <% let subTotalProductAmount=0; %>
+                  <% data.products.forEach((item, i)=> { %>
+                    <tr>
+                      <td>
+                        <%= i + 1 %>
+                      </td>
+                      <td>
+                        <%= item.name %>
+                      </td>
+                      <td>
+                        <%= item.hsn %>
+                      </td>
+                      <td class="text-end">₹<%= item.price.toFixed(2) %>
+                      </td>
+                      <td class="text-center">
+                        <%= item.quantity %>
+                      </td>
+                      <!-- <td class="text-end">₹<%= item.taxableValue.toFixed(2) %></td> -->
+                      <td class="text-center">
+                        <%= item.gst %>%
+                      </td>
+                      <td class="text-end">₹<%= item.taxableValue.toFixed(2) %>
+                      </td>
+                    </tr>
+                    <% totalAmount +=item.taxableValue; %>
+                      <% subTotalProductAmount +=item.price * item.quantity; %>
+                        <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row justify-content-end">
+          <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between">
+                <span>SubTotal</span>
+                <strong>₹<%= subTotalProductAmount.toFixed(2) %></strong>
+                <!-- <strong>₹<%= data.subTotal.toFixed(2) %></strong> -->
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>CGST</span>
+                <strong>₹<%= data.csgst.toFixed(2) %></strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>SGST</span>
+                <strong>₹<%= data.csgst.toFixed(2) %></strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between bg-light">
+                <span class="fw-bold">Grand Total</span>
+                <strong class="fw-bold">₹<%= data.subTotal.toFixed(2) %></strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="text-center mt-5">
+          <p class="text-muted small">
+            This is a system-generated invoice and does not require a signature.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
