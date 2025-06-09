@@ -1,4 +1,5 @@
-import { messaging } from './../../config/firebaseAdmin.js';
+import { messaging } from '../../confing/firebaseAdmin.js';
+
 
 export async function sendNotification(deviceTokens, notificationPayload, customData = {}) {
     const tokensArray = Array.isArray(deviceTokens) ? deviceTokens : [deviceTokens];

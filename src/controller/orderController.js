@@ -1,11 +1,13 @@
 import { orderModel, orderValidation, getOrderValidation, } from "../model/orderModel.js";
 import response from "../utils/response.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
+import { sendNotification } from '../utils/sendNotification.js';
 import { productModel } from '../model/productModel.js';
 import { Types } from 'mongoose';
 import { cartModel } from '../model/cartModel.js';
 import sendMail from '../../mailer/index.js';
 import generateInvoicePDF from '../utils/generateInvoicePDF.js'
+import { userModel } from '../model/userModel.js'
 
 // placeOrder
 export async function placeOrder(req, res) {
@@ -42,13 +44,41 @@ export async function placeOrder(req, res) {
       totalAmount,
       orderNote,
     });
-    // const fullName = `${fname} ${lname}`;
-    // const orderSummary = cartItems.slice(0, 2).map(i => `${i.quantity}x Item`).join(', ') + (cartItems.length > 2 ? '...' : '');
+    const fullName = `${fname} ${lname}`;
+    const orderSummary = cartItems.slice(0, 2).map(i => `${i.quantity}x Item`).join(', ') + (cartItems.length > 2 ? '...' : '');
     const productIds = cartItems.map(item => new Types.ObjectId(item.productId));
     const orderedProducts = await productModel.find({
       _id: { $in: productIds }
     });
-    // const productSkus = orderedProducts.map(product => product.sku).join(', ');
+    const productSkus = orderedProducts.map(product => product.sku).join(', ');
+    const adminFcmToken = await userModel.find({ role: "admin" })
+    await sendNotification(
+      adminFcmToken.fcm,
+      {
+        title: '🛒 New Order Placed!',
+        body: `Order #${orderId} by ${fullName} for ₹${totalAmount}`
+      },
+      {
+        orderId,
+        customerName: fullName,
+        totalAmount: totalAmount.toString(),
+        paymentMethod,
+        mobile,
+        email,
+        shippingCharge,
+        SKU: productSkus,
+        totalItem: cartItems.length.toString(),
+        address: {
+          streetAddress: streetAddress.join(', '),
+          shippingAddress: shippingAddress,
+          state,
+          country,
+          pincode
+        },
+        orderNote,
+        orderSummary
+      }
+    );
     await cartModel.updateOne(
       { userId: req.user.id },
       { $pull: { items: { productId: { $in: productIds } } } }

@@ -59,6 +59,38 @@ export async function login(req, res) {
   };
 };
 
+export async function adminLogin(req, res) {
+  const { email, password, fcm } = req.body;
+  const { error } = userLoginValidation.validate(req.body);
+  if (error) {
+    return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+  };
+  try {
+    const user = await userModel.findOne({ email, isActive: true, role: 'admin' });
+    if (!user) {
+      return response.error(res, req.languageCode, resStatusCode.FORBIDDEN, resMessage.USER_ACCOUNT_NOT_FOUND, {});
+    };
+    const validPassword = await compare(password, user.password);
+    if (!validPassword) {
+      return response.error(res, req.languageCode, resStatusCode.UNAUTHORISED, resMessage.INVALID_PASSWORD, {});
+    };
+    const updatedFcm = await userModel.findByIdAndUpdate(
+      { _id: user._id },
+      {
+        $set: {
+          fcm: fcm,
+        },
+      },
+      { new: false, runValidators: false }
+    );
+    const token = await generateToken({ _id: user._id, role: 'admin' });
+    return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.LOGIN_SUCCESS, { _id: user._id, token: token });
+  } catch (err) {
+    console.error(err);
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
+  };
+};
+
 // profile
 export async function profile(req, res) {
   try {
