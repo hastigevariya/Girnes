@@ -14,7 +14,10 @@ export async function addSubCategory(req, res) {
     if (existing) {
       return response.error(res, req.languageCode, resStatusCode.CONFLICT, resMessage.ALREADY_EXISTS);
     };
-    const newSubCategory = await subCategoryModel.create({ name, categoryId, });
+    const lastCategory = await subCategoryModel.findOne().sort({ subcategoryNum: -1 });
+    const newCategoryId = typeof lastCategory?.subcategoryNum === 'number' ? lastCategory.subcategoryNum + 1 : 101;
+
+    const newSubCategory = await subCategoryModel.create({ name, categoryId, subcategoryNum: newCategoryId });
     return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.SUBCATEGORY_CREATED || resMessage.ACTION_COMPLETE, newSubCategory);
   } catch (err) {
     console.error(err);

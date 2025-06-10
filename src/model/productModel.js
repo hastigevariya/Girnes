@@ -41,39 +41,6 @@ const dailydealSchema = new mongoose.Schema(
 );
 export const dailydealModel = mongoose.model("dailydeals", dailydealSchema);
 
-// const hotdealSchema = new mongoose.Schema(
-//   {
-//     productId: {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: "products",
-//       required: true,
-//     },
-//     salePrice: {
-//       type: Number,
-//       required: true,
-//     },
-//     isDailySale: {
-//       type: Boolean,
-//       default: false,
-//     },
-//     startSale: {
-//       type: Date,
-//       required: true,
-//     },
-//     endSale: {
-//       type: Date,
-//       required: true,
-//     },
-//     isActive: {
-//       type: Boolean,
-//       default: false,
-//     },
-//   },
-//   { timestamps: true }
-// );
-
-// export const hotdealModel = mongoose.model("hotdeals", hotdealSchema);
-
 
 import Joi from "joi";
 
@@ -219,27 +186,44 @@ export const updateProductValidation = Joi.object({
 
 });
 
-// export const hotDealValidation = Joi.object({
-//   productId: Joi.string().required().messages({
-//     "string.base": "Product ID must be a string",
-//     "string.empty": "Product ID is required",
-//     "any.required": "Product ID is required",
-//   }),
-//   salePrice: Joi.number().min(0).required().messages({
-//     "number.base": "Sale price must be a number",
-//     "number.min": "Sale price must be at least 0",
-//     "any.required": "Sale price is required",
-//   }),
-//   startSale: Joi.date().required().messages({
-//     "date.base": "Start sale must be a valid date",
-//     "any.required": "Start sale date is required",
-//   }),
-//   endSale: Joi.date().greater(Joi.ref('startSale')).required().messages({
-//     "date.base": "End sale must be a valid date",
-//     "date.greater": "End sale must be after start sale",
-//     "any.required": "End sale date is required",
-//   }),
-//   isActive: Joi.boolean().optional(),
-//   isDailySale: Joi.boolean().optional(),
-// });
+const productSearchValidation = Joi.object({
+  searchProduct: Joi.string().required().messages({
+    'string.empty': 'Search term is required.',
+    'any.required': 'Search term is required.'
+  }),
+});
 
+
+export const productFileSchema = Joi.object({
+  title: Joi.string().required(),
+  shortDescription: Joi.string().optional(),
+  description: Joi.string().required(),
+  benefits: Joi.string().required(),
+  weight: Joi.string().required(),
+  price: Joi.number().required(),
+  mrp: Joi.number().required(),
+  sku: Joi.string().required(),
+  stock: Joi.number().optional(),
+  quantity: Joi.number().optional(),
+  subcategoryId: Joi.number().required(),
+  isActive: Joi.boolean().truthy(true).falsy(false).optional(),
+  isFeatured1: Joi.string().optional(),
+  isFeatured2: Joi.string().optional(),
+  isFeatured3: Joi.string().optional(),
+  isFeatured4: Joi.string().optional(),
+  isFeatured5: Joi.string().optional(),
+  isFeatured6: Joi.string().optional(),
+  image1: Joi.string().allow('').optional(),
+  image2: Joi.string().allow('').optional(),
+  image3: Joi.string().allow('').optional(),
+  image4: Joi.string().allow('').optional(),
+  image5: Joi.string().allow('').optional(),
+});
+
+export default {
+  productModel,
+  productValidation,
+  productSearchValidation,
+  updateProductValidation,
+  productFileSchema
+};

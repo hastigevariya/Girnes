@@ -30,6 +30,12 @@ export const categoryValidation = Joi.object({
   isActive: Joi.boolean().optional(),
 });
 
+export default {
+  categoryModel,
+  categoryValidation,
+  // categoryIdValidation,
+  // categoryInActiveValidation
+};
 // import mongoose from "mongoose";
 // import Joi from "joi";
 

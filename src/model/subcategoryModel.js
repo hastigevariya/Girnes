@@ -13,6 +13,10 @@ const subCategorySchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
+    subcategoryNum: {
+      type: Number,
+      require: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

@@ -1,9 +1,17 @@
-import { productModel, productValidation, dailydealModel } from "../model/productModel.js";
+import { productModel, productValidation, dailydealModel, updateProductValidation, productFileSchema } from "../model/productModel.js";
 import response from "../utils/response.js";
 import { orderModel } from "../model/orderModel.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
 import mongoose from "mongoose";
-import { updateProductValidation } from "../model/productModel.js";
+import { getAvailableFileName } from '../utils/multer.js';
+import xlsx from 'xlsx';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+
+
+
 
 // Create Product
 export const createProduct = async (req, res) => {
@@ -82,7 +90,7 @@ export const createProduct = async (req, res) => {
 //getall
 export const getAllProducts = async (req, res) => {
   try {
-    const { error } = getAllProductsValidation.validate(req.query);
+    const { error } = productValidation.validate(req.query);
     if (error) {
       return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
     };
@@ -316,5 +324,117 @@ export const getPopularProducts = async (req, res) => {
   } catch (error) {
     console.error("Error fetching popular products:", error.message);
     return response.error(res, req.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR);
+  };
+};
+
+// downloadAddBulkProductTemplate
+export async function downloadAddBulkProductTemplate(req, res) {
+
+  try {
+    const data = [
+      {
+        title: "",
+        // shortDescription: "",
+        isFeatured1: "",
+        isFeatured2: "",
+        isFeatured3: "",
+        isFeatured4: "",
+        isFeatured5: "",
+        isFeatured6: "",
+        weight: "",
+        price: 0,
+        mrp: 0,
+        description: "",
+        benefits: "",
+        subcategoryId: "",
+        image1: "",
+        image2: "",
+        image3: "",
+        image4: "",
+        image5: "",
+        sku: "",
+        stock: 1,
+        quantity: 1,
+        isActive: true
+      }
+    ];
+
+    const ws = xlsx.utils.json_to_sheet(data);
+    const wb = xlsx.utils.book_new();
+
+    xlsx.utils.book_append_sheet(wb, ws, 'Products');
+    // xlsx.utils.sheet_add_aoa(wb, ws, { origin: ["N2"] });
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    //const filePath = path.join(__dirname, '../../templates/add_bulk_products.xlsx');
+
+
+    const dir = path.join(__dirname, '../../public/file');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+    const filePath = getAvailableFileName(dir, 'product_template', 'xlsx');
+    xlsx.writeFile(wb, filePath, {
+      bookType: 'xlsx',
+      cellStyles: true
+    });
+
+    const downloadUrl = `/file/${path.basename(filePath)}`;
+    return response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.FILE_READY, { url: downloadUrl });
+  } catch (error) {
+    console.error(error);
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
+  };
+};
+
+// uploadBulkProductsFile
+export async function uploadBulkProductsFile(req, res) {
+  try {
+    if (!req.file) {
+      return response.error(res, req?.languageCode, resStatusCode.FORBIDDEN, resMessage.NO_FILE_UPLOADED, {});
+    };
+    const workbook = xlsx.readFile(req.file.path);
+    const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+
+    const products = data.map((row, i) => {
+      console.log("row", row.sku);
+
+      row.sku = row.sku.toString();
+      row.subcategoryId = parseInt(row.subcategoryId);
+      console.log("row", row);
+      console.log("i", i);
+      const { error, value } = productFileSchema.validate(row);
+      if (error) {
+        return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+      };
+
+      return {
+        ...value,
+        isActive: value.isActive === true || value.isActive === 'true',
+        isFeatured: [
+          value.isFeatured1 || '',
+          value.isFeatured2,
+          value.isFeatured3,
+          value.isFeatured4,
+          value.isFeatured5,
+          value.isFeatured6,
+        ],
+        image: [
+          value.image1 || '',
+          value.image2,
+          value.image3,
+          value.image4,
+          value.image5,
+        ]
+      };
+    });
+
+    await productModel.insertMany(products);
+    fs.unlinkSync(req.file.path);
+    response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessagePRODUCTS_UPLOADED, {});
+  } catch (error) {
+    console.log('error', error);
+    if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   };
 };

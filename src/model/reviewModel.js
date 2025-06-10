@@ -83,3 +83,8 @@ export const inActiveValidation = Joi.object({
         "string.empty": "isActive cannot be empty",
     }),
 });
+export default {
+    reviewModel,
+    reviewValidation,
+    inActiveValidation,
+};
