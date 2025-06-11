@@ -202,23 +202,27 @@ export const productFileSchema = Joi.object({
   weight: Joi.string().required(),
   price: Joi.number().required(),
   mrp: Joi.number().required(),
+  tag: Joi.string().required(),
   sku: Joi.string().required(),
   stock: Joi.number().optional(),
   quantity: Joi.number().optional(),
   subcategoryId: Joi.number().required(),
+  gst: Joi.number().required(),
+  hsncode: Joi.number().required(),
   isActive: Joi.boolean().truthy(true).falsy(false).optional(),
-  isFeatured1: Joi.string().optional(),
-  isFeatured2: Joi.string().optional(),
-  isFeatured3: Joi.string().optional(),
-  isFeatured4: Joi.string().optional(),
-  isFeatured5: Joi.string().optional(),
-  isFeatured6: Joi.string().optional(),
+  bulletPoint1: Joi.string().allow('').optional(),
+  bulletPoint2: Joi.string().allow('').optional(),
+  bulletPoint3: Joi.string().allow('').optional(),
+  bulletPoint4: Joi.string().allow('').optional(),
+  bulletPoint5: Joi.string().allow('').optional(),
   image1: Joi.string().allow('').optional(),
   image2: Joi.string().allow('').optional(),
   image3: Joi.string().allow('').optional(),
   image4: Joi.string().allow('').optional(),
   image5: Joi.string().allow('').optional(),
 });
+
+
 
 export default {
   productModel,

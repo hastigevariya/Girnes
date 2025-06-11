@@ -7,11 +7,12 @@ import { getAvailableFileName } from '../utils/multer.js';
 import xlsx from 'xlsx';
 import path from 'path';
 import fs from 'fs';
+import { subCategoryModel } from "../model/subcategoryModel.js";
 import { fileURLToPath } from 'url';
-
-
-
-
+const __filename = fileURLToPath(import.meta.url);
+import { dirname } from 'path';
+const __dirname = dirname(__filename);
+import axios from 'axios';
 
 // Create Product
 export const createProduct = async (req, res) => {
@@ -335,13 +336,13 @@ export async function downloadAddBulkProductTemplate(req, res) {
       {
         title: "",
         // shortDescription: "",
-        isFeatured1: "",
-        isFeatured2: "",
-        isFeatured3: "",
-        isFeatured4: "",
-        isFeatured5: "",
-        isFeatured6: "",
+        bulletPoint1: "",
+        bulletPoint2: "",
+        bulletPoint3: "",
+        bulletPoint4: "",
+        bulletPoint5: "",
         weight: "",
+        tag: "",
         price: 0,
         mrp: 0,
         description: "",
@@ -353,6 +354,8 @@ export async function downloadAddBulkProductTemplate(req, res) {
         image4: "",
         image5: "",
         sku: "",
+        gst: "",
+        hsncode: "",
         stock: 1,
         quantity: 1,
         isActive: true
@@ -388,53 +391,219 @@ export async function downloadAddBulkProductTemplate(req, res) {
 };
 
 // uploadBulkProductsFile
+// export async function uploadBulkProductsFile(req, res) {
+//   try {
+//     if (!req.file) {
+//       return response.error(res, req?.languageCode, resStatusCode.FORBIDDEN, resMessage.NO_FILE_UPLOADED, {});
+//     };
+//     const workbook = xlsx.readFile(req.file.path);
+//     const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+
+//     const products = data.map((row, i) => {
+//       console.log("row", row.sku);
+
+//       row.sku = row.sku.toString();
+//       row.subcategoryId = parseInt(row.subcategoryId);
+//       console.log("row", row);
+//       console.log("i", i);
+//       const { error, value } = productFileSchema.validate(row);
+//       if (error) {
+//         return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+//       };
+
+//       return {
+//         ...value,
+//         isActive: value.isActive === true || value.isActive === 'true',
+//         isFeatured: [
+//           value.isFeatured1 || '',
+//           value.isFeatured2,
+//           value.isFeatured3,
+//           value.isFeatured4,
+//           value.isFeatured5,
+//           value.isFeatured6,
+//         ],
+//         image: [
+//           value.image1 || '',
+//           value.image2,
+//           value.image3,
+//           value.image4,
+//           value.image5,
+//         ]
+//       };
+//     });
+
+//     await productModel.insertMany(products);
+//     fs.unlinkSync(req.file.path);
+//     response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessagePRODUCTS_UPLOADED, {});
+//   } catch (error) {
+//     console.log('error', error);
+//     if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+//     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
+//   };
+// };
+
+// uploadBulkProductsFile
+
+
+function generateUniqueFilename(extension = 'jpg') {
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
+};
+function getFileExtensionFromUrl(url) {
+  if (!url) return 'jpg';
+  const match = url.match(/\.(jpg|jpeg|png|gif|bmp|webp)(\?|$)/i);
+  return match ? match[1] : 'jpg';
+};
+
+function convertGoogleDriveToDirectLink(url) {
+  const match = url.match(/\/d\/(.+?)\//);
+  if (!match) return url;
+  const fileId = match[1];
+  return `https://drive.google.com/uc?export=download&id=${fileId}`;
+};
+
+async function downloadImageFromUrl(imageUrl, filename) {
+  const uploadDir = path.join(__dirname, '../../public/productImages');
+  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+  if (!imageUrl || !filename) {
+    console.log('Invalid imageUrl or filename, skipping download');
+    return null;
+  };
+
+  const filePath = path.join(uploadDir, filename);
+  const directUrl = convertGoogleDriveToDirectLink(imageUrl);
+
+  const response = await axios.get(directUrl, { responseType: 'stream' });
+  const writer = fs.createWriteStream(filePath);
+  response.data.pipe(writer);
+
+  return new Promise((resolve, reject) => {
+    writer.on('finish', () => resolve(filename));
+    writer.on('error', (err) => {
+      console.error('Error writing file:', err);
+      reject(err);
+    });
+  });
+};
+
+
 export async function uploadBulkProductsFile(req, res) {
   try {
     if (!req.file) {
       return response.error(res, req?.languageCode, resStatusCode.FORBIDDEN, resMessage.NO_FILE_UPLOADED, {});
     };
-    const workbook = xlsx.readFile(req.file.path);
-    const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+    const fileMimeType = req.file.mimetype;
+    const fileExtension = path.extname(req.file.originalname).toLowerCase();
 
-    const products = data.map((row, i) => {
-      console.log("row", row.sku);
+    if (
+      fileMimeType !== 'text/csv' &&
+      fileMimeType !== 'application/vnd.ms-excel' &&
+      fileExtension !== '.csv'
+    ) {
+      fs.unlinkSync(req.file.path);
+      return response.error(res, req.languageCode, resStatusCode.UNSUPPORTED_MEDIA_TYPE, resMessage.FILE_TYPE_NOT_ACCEPTED, {});
+    };
+    const workbook = xlsx.readFile(req.file.path, { type: 'file' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = xlsx.utils.sheet_to_json(sheet);
 
-      row.sku = row.sku.toString();
-      row.subcategoryId = parseInt(row.subcategoryId);
-      console.log("row", row);
-      console.log("i", i);
+    const finalProducts = [];
+    const subCategoryCache = {};
+
+    for (let i = 0; i < rows.length; i++) {
+
+      const row = rows[i];
+      if (typeof row.gst === 'number') {
+        row.gst = row.gst.toString();
+      };
+      if (typeof row.sku === 'number') {
+        row.sku = row.sku.toString();
+      };
+      // if (typeof row.hsncode === 'number') {
+      //   row.hsncode = row.hsncode.toString();
+      // };
       const { error, value } = productFileSchema.validate(row);
+
       if (error) {
-        return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
+        fs.unlinkSync(req.file.path);
+        return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, `Row ${i + 2} error: ${error.details[0].message}. Please fix the error and upload the file again.`);
       };
 
-      return {
-        ...value,
+      let subCategory = subCategoryCache[value.subCategoryId];
+      console.log('subCategory', value);
+      if (!subCategory) {
+        subCategory = await subCategoryModel.findOne({ subcategoryNum: value.subcategoryId });
+        if (!subCategory) {
+          fs.unlinkSync(req.file.path);
+          return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, `Row ${i + 2}: Subcategory ID ${value.subCategoryId} is invalid or does not exist.`);
+        }
+        subCategoryCache[value.subCategoryId] = subCategory;
+      };
+
+      const imageUrls = [value.image1, value.image2, value.image3, value.image4, value.image5].filter(Boolean);
+      const downloadedImages = [];
+
+      for (const url of imageUrls) {
+        const ext = getFileExtensionFromUrl(url);
+        const filename = generateUniqueFilename(ext);
+        const downloadedFilename = await downloadImageFromUrl(url, filename);
+        if (downloadedFilename) downloadedImages.push(downloadedFilename);
+      };
+
+      let gstValue = '';
+      if (value.gst !== '' && value.gst !== null && value.gst !== undefined) {
+        const gstNum = Number(value.gst);
+        gstValue = !isNaN(gstNum) ? gstNum + '%' : String(value.gst);
+      };
+      console.log(' parseInt(value.hsncode)', value.isActive);
+      const formattedProduct = {
+        title: value.title,
+        sku: value.sku,
+        bulletPoint: [
+          value.bulletPoint1 || '',
+          value.bulletPoint2 || '',
+          value.bulletPoint3 || '',
+          value.bulletPoint4 || '',
+          value.bulletPoint5 || '',
+        ].filter(Boolean),
+        // variants: [
+        //   {
+        // weight: value.weight,
+        hsnCode: parseInt(value.hsncode),
+        price: value.price,
+        mrp: value.mrp,
+        tag: value.tag,
+        // discountPrice: Number(value.discountPrice || 0),
+        // startSaleOn: value.startSaleOn ? new Date(value.startSaleOn) : null,
+        // endSaleOn: value.endSaleOn ? new Date(value.endSaleOn) : null,
+        // saleStatus: value.saleStatus === true || value.saleStatus === 'true',
+        //   },
+        // ],
+        description: value.description,
+        benefits: value.benefits,
+        subcategoryId: subCategory._id,
+        gst: gstValue,
+        hsnCode: value.hsncode,
+        image: downloadedImages,
+        stock: value.stock,
+        quantity: value.quantity,
+        // isPopular: false,
+        isDelete: false,
         isActive: value.isActive === true || value.isActive === 'true',
-        isFeatured: [
-          value.isFeatured1 || '',
-          value.isFeatured2,
-          value.isFeatured3,
-          value.isFeatured4,
-          value.isFeatured5,
-          value.isFeatured6,
-        ],
-        image: [
-          value.image1 || '',
-          value.image2,
-          value.image3,
-          value.image4,
-          value.image5,
-        ]
       };
-    });
-
-    await productModel.insertMany(products);
+      finalProducts.push(formattedProduct);
+    };
+    await productModel.insertMany(finalProducts);
     fs.unlinkSync(req.file.path);
-    response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessagePRODUCTS_UPLOADED, {});
+    return response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.PRODUCTS_UPLOADED, {});
   } catch (error) {
-    console.log('error', error);
-    if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    console.error('Error uploading file:', error);
+    if (req.file?.path && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    };
+    if (error.code === 11000 && error.errorResponse) {
+      return response.error(res, req?.languageCode, resStatusCode.CLIENT_ERROR, `Duplicate key error: ${error.errorResponse?.message}`, error?.result || null);
+    };
     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
   };
 };
