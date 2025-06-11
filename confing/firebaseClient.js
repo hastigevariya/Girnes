@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getAnalytics } from './girnes-e-com-firebase-adminsdk-fbsvc-470cd7e120.json';
+// import { getAnalytics } from './girnes-e-com-firebase-adminsdk-fbsvc-470cd7e120.json';
+import { getAnalytics } from 'firebase/analytics';
 
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
@@ -11,7 +12,10 @@ const firebaseConfig = {
     measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 };
 
+// const app = initializeApp(firebaseConfig);
+// const analytics = getAnalytics(app);
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+
 
 export default { app, analytics };
