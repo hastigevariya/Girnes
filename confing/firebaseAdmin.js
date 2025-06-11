@@ -18,9 +18,8 @@ import admin from 'firebase-admin';
 import dotenv from 'dotenv';
 
 dotenv.config();
-const rawKey = process.env.FIREBASE_PRIVATE_KEY;
+const rawKey = process.env.FIREBASE_PRIVATE_KEY || "";
 const privateKey = rawKey.replace(/\\n/g, '\n');
-
 if (!admin.apps.length) {
     admin.initializeApp({
         credential: admin.credential.cert({
