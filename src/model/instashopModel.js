@@ -28,3 +28,8 @@ export const addInstaShopValidation = Joi.object({
         "boolean.base": "isActive must be a boolean value"
     })
 });
+
+export default {
+    instaModel,
+    addInstaShopValidation
+}

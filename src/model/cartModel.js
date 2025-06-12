@@ -34,12 +34,6 @@ const cartValidation = Joi.object({
   isActive: Joi.boolean().default(true),
 });
 
-// const updateCartValidation = Joi.object({
-//   quantity: Joi.number().integer().messages({
-//     "number.base": "Quantity must be a number",
-//     "number.min": "Quantity must be at least 1",
-//   }),
-
 const updateCartValidation = Joi.object({
   quantity: Joi.number().integer().min(1).required().messages({
     "number.base": "Quantity must be a number",
@@ -49,14 +43,5 @@ const updateCartValidation = Joi.object({
 
   isActive: Joi.boolean().default(true),
 });
-
-// const updateCartValidation = Joi.object({
-//   productId: Joi.string()
-//     .required()
-//     .message({
-//       quantity: Joi.number().integer().min(1).required(),
-//     }),
-//   isActive: Joi.boolean().default(true),
-// });
 
 export { cartModel, cartValidation, updateCartValidation };

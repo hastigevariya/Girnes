@@ -91,3 +91,12 @@ export const companyinfoValidation = Joi.object({
         "any.required": "Email is required",
     }),
 });
+
+export default {
+    contactModel,
+    contactValidation,
+
+    companyinfoModel,
+    companyinfoValidation
+};
+

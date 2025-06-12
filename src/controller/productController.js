@@ -335,7 +335,6 @@ export async function downloadAddBulkProductTemplate(req, res) {
     const data = [
       {
         title: "",
-        // shortDescription: "",
         bulletPoint1: "",
         bulletPoint2: "",
         bulletPoint3: "",
@@ -366,11 +365,9 @@ export async function downloadAddBulkProductTemplate(req, res) {
     const wb = xlsx.utils.book_new();
 
     xlsx.utils.book_append_sheet(wb, ws, 'Products');
-    // xlsx.utils.sheet_add_aoa(wb, ws, { origin: ["N2"] });
 
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    //const filePath = path.join(__dirname, '../../templates/add_bulk_products.xlsx');
 
 
     const dir = path.join(__dirname, '../../public/file');
@@ -390,61 +387,7 @@ export async function downloadAddBulkProductTemplate(req, res) {
   };
 };
 
-// uploadBulkProductsFile
-// export async function uploadBulkProductsFile(req, res) {
-//   try {
-//     if (!req.file) {
-//       return response.error(res, req?.languageCode, resStatusCode.FORBIDDEN, resMessage.NO_FILE_UPLOADED, {});
-//     };
-//     const workbook = xlsx.readFile(req.file.path);
-//     const data = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
-//     const products = data.map((row, i) => {
-//       console.log("row", row.sku);
-
-//       row.sku = row.sku.toString();
-//       row.subcategoryId = parseInt(row.subcategoryId);
-//       console.log("row", row);
-//       console.log("i", i);
-//       const { error, value } = productFileSchema.validate(row);
-//       if (error) {
-//         return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
-//       };
-
-//       return {
-//         ...value,
-//         isActive: value.isActive === true || value.isActive === 'true',
-//         isFeatured: [
-//           value.isFeatured1 || '',
-//           value.isFeatured2,
-//           value.isFeatured3,
-//           value.isFeatured4,
-//           value.isFeatured5,
-//           value.isFeatured6,
-//         ],
-//         image: [
-//           value.image1 || '',
-//           value.image2,
-//           value.image3,
-//           value.image4,
-//           value.image5,
-//         ]
-//       };
-//     });
-
-//     await productModel.insertMany(products);
-//     fs.unlinkSync(req.file.path);
-//     response.success(res, req?.languageCode, resStatusCode.ACTION_COMPLETE, resMessagePRODUCTS_UPLOADED, {});
-//   } catch (error) {
-//     console.log('error', error);
-//     if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-//     return response.error(res, req?.languageCode, resStatusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR, {});
-//   };
-// };
-
-// uploadBulkProductsFile
-
-
+// generateUniqueFilename
 function generateUniqueFilename(extension = 'jpg') {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
 };
@@ -486,7 +429,7 @@ async function downloadImageFromUrl(imageUrl, filename) {
   });
 };
 
-
+// uploadBulkProductsFile
 export async function uploadBulkProductsFile(req, res) {
   try {
     if (!req.file) {
@@ -519,9 +462,6 @@ export async function uploadBulkProductsFile(req, res) {
       if (typeof row.sku === 'number') {
         row.sku = row.sku.toString();
       };
-      // if (typeof row.hsncode === 'number') {
-      //   row.hsncode = row.hsncode.toString();
-      // };
       const { error, value } = productFileSchema.validate(row);
 
       if (error) {
@@ -566,19 +506,10 @@ export async function uploadBulkProductsFile(req, res) {
           value.bulletPoint4 || '',
           value.bulletPoint5 || '',
         ].filter(Boolean),
-        // variants: [
-        //   {
-        // weight: value.weight,
         hsnCode: parseInt(value.hsncode),
         price: value.price,
         mrp: value.mrp,
         tag: value.tag,
-        // discountPrice: Number(value.discountPrice || 0),
-        // startSaleOn: value.startSaleOn ? new Date(value.startSaleOn) : null,
-        // endSaleOn: value.endSaleOn ? new Date(value.endSaleOn) : null,
-        // saleStatus: value.saleStatus === true || value.saleStatus === 'true',
-        //   },
-        // ],
         description: value.description,
         benefits: value.benefits,
         subcategoryId: subCategory._id,
@@ -587,7 +518,6 @@ export async function uploadBulkProductsFile(req, res) {
         image: downloadedImages,
         stock: value.stock,
         quantity: value.quantity,
-        // isPopular: false,
         isDelete: false,
         isActive: value.isActive === true || value.isActive === 'true',
       };

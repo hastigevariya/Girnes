@@ -1,4 +1,4 @@
-import { categoryModel, categoryValidation } from "../model/categoryModel.js";
+import { categoryModel, categoryValidation, categoryInActiveValidation } from "../model/categoryModel.js";
 import response from "../utils/response.js";
 import { resStatusCode, resMessage } from "../utils/constants.js";
 import mongoose from "mongoose";
@@ -81,7 +81,7 @@ export async function inActiveCategory(req, res) {
   const { isActive } = req.body;
 
   try {
-    const { error } = categoryValidation.validate({ categoryId, isActive });
+    const { error } = categoryInActiveValidation.validate({ categoryId, isActive });
     if (error) {
       return response.error(res, req.languageCode, resStatusCode.CLIENT_ERROR, error.details[0].message);
     };

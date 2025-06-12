@@ -17,15 +17,6 @@ const wishlistItemSchema = new Schema(
   { _id: true }
 );
 
-// const wishlistSchema = new Schema(
-//   {
-//     userId: { type: Schema.Types.ObjectId, ref: "users", required: true },
-//     items: [wishlistItemSchema],
-//     isActive: { type: Boolean, default: true },
-//   },
-//   { timestamps: true }
-// );
-
 export const wishlistModel = mongoose.model("wishlist", wishlistItemSchema);
 
 export const wishlistActionValidation = Joi.object({
@@ -35,3 +26,8 @@ export const wishlistActionValidation = Joi.object({
     "any.required": "Product ID is required",
   }),
 });
+
+export default {
+  wishlistModel,
+  wishlistActionValidation,
+};

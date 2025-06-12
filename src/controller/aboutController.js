@@ -19,7 +19,7 @@ export const addAbout = async (req, res) => {
             aboutus = await aboutUsModel.create(payload);
         } else {
             aboutus = await aboutUsModel.findOneAndUpdate({}, payload, { new: true });
-        }
+        };
 
         return response.success(res, req.languageCode, resStatusCode.ACTION_COMPLETE, resMessage.ABOUT_CREATED, aboutus);
     } catch (error) {
